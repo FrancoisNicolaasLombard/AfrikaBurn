@@ -37,7 +37,7 @@
       </VBox>
    </left>
    <center>
-      <AnchorPane fx:id="bkground" minHeight="-Infinity" minWidth="-Infinity" prefHeight="571.0" prefWidth="727.0" style="-fx-background-color: white;" BorderPane.alignment="CENTER">
+      <AnchorPane fx:id="bkground" minHeight="-Infinity" minWidth="-Infinity" onMouseDragged="#mouseDrag" onMousePressed="#mouseDown" onMouseReleased="#mouseUp" onScroll="#mouseZoom" prefHeight="571.0" prefWidth="727.0" style="-fx-background-color: white;" BorderPane.alignment="CENTER">
          <children>
             <Pane fx:id="holder" minHeight="-Infinity" minWidth="-Infinity" onMouseDragged="#mouseDrag" onMousePressed="#mouseDown" onMouseReleased="#mouseUp" onScroll="#mouseZoom" prefHeight="571.0" prefWidth="727.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
          </children>

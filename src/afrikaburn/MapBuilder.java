@@ -2,7 +2,6 @@ package afrikaburn;
 
 import java.io.File;
 import javafx.collections.ObservableList;
-import javafx.event.EventHandler;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
@@ -147,12 +146,11 @@ public class MapBuilder {
     public double area(Polygon bound){
         double area = 0;
         System.out.println(bound.getPoints());
-        for (int data = 0; data < bound.getPoints().size() - 2; data+=2){
-            //area -= bound.getPoints().get(data) * bound.getPoints().get(data + );
-           // area += bound.getPoints().get(data+1) * bound.getPoints().get(data + 2);
-           // area /= 2;
+        for (int data = 0; data < bound.getPoints().size()-5; data+=2){
+            area -= (bound.getPoints().get(data) * bound.getPoints().get(data + 3));
+            area += (bound.getPoints().get(data+1) * bound.getPoints().get(data + 2));
         }
-        System.out.println("awe");
+        area /= 2;
         return Math.abs(area);
     }
 }
