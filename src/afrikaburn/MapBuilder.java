@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package afrikaburn;
 
 import java.io.File;
@@ -29,6 +24,9 @@ public class MapBuilder {
     private double lonMax;
     private final int totalPolygons;
 
+    /**
+     * 
+     */
     MapBuilder() {
         JSONReader reader = new JSONReader(new File("resources/afrikaburnmap.json"));
         polygons = reader.polygons();
@@ -51,6 +49,7 @@ public class MapBuilder {
             current.setStroke(Color.BLACK);
             current.setStrokeWidth(1);
             current.setOnMouseEntered((MouseEvent mouseEvent) -> {
+                System.out.println(area(current));
                 current.setFill(Color.BLUE);
             });
             current.setOnMouseExited((MouseEvent mouseEvent) -> {
@@ -109,12 +108,20 @@ public class MapBuilder {
         }
     }
 
+    /**
+     * 
+     * @param deltaX
+     * @param deltaY 
+     */
     public void dragMap(double deltaX, double deltaY) {
         for (int count = 0; count < totalPolygons; count++) {
             polygons[count].getTransforms().add(new Translate(-deltaY, deltaX));
         }
     }
 
+    /**
+     * 
+     */
     public void zoomIn() {
         for (int count = 0; count < totalPolygons; count++) {
             polygons[count].setScaleX(polygons[count].getScaleX() + 0.05);
@@ -122,10 +129,29 @@ public class MapBuilder {
         }
     }
 
+    /**
+     * 
+     */
     public void zoomOut() {
         for (int count = 0; count < totalPolygons; count++) {
             polygons[count].setScaleX(polygons[count].getScaleX() - 0.05);
             polygons[count].setScaleY(polygons[count].getScaleY() - 0.05);
         }
+    }
+    
+    /**
+     * 
+     * @param bound
+     * @return 
+     */
+    public double area(Polygon bound){
+        double area = 0;
+        System.out.println(bound.getPoints());
+        for (int data = 0; data < bound.getPoints().size() - 3; data+=2){
+            area -= bound.getPoints().get(data) * bound.getPoints().get(data + 3);
+            area += bound.getPoints().get(data+1) * bound.getPoints().get(data + 2);
+            area /= 2;
+        }
+        return Math.abs(area);
     }
 }
