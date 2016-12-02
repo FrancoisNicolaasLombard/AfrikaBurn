@@ -1,0 +1,38 @@
+/*
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+*/
+/* 
+    Created on : 29 Nov 2016, 3:50:35 PM
+    Author     : User
+*/
+
+.root{
+    -fx-background-color: #383838;
+    -fx-font-size: 11pt;
+    -fx-font-family: "Verdana";
+    -fx-base: #999999;
+   
+}
+
+/*
+Inline style for the labels
+*/
+.label{
+    -fx-text-fill: #cccccc;
+}
+
+/*
+Inline style for the menu buttons
+*/
+.button-menu{
+    -fx-background-radius: 0;
+}
+
+/*
+Inline style for the box buttons
+*/
+.button-box{
+    -fx-background-radius: 5;
+}
