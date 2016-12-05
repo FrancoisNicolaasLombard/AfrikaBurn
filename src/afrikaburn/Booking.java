@@ -2,16 +2,21 @@ package afrikaburn;
 
 /**
  *
- * @author User
+ * @Author: FN Lombard
+ * @Company: VASTech
+ * @Description
  */
 public class Booking {
+
     private String name;
+    private double front;
     private double size;
     private boolean noiseSensitivite;
     private boolean eroticSensitive;
 
-    public Booking(String name, double size, boolean noiseSensitivite, boolean eroticSensitive) {
+    public Booking(String name, double front, double size, boolean noiseSensitivite, boolean eroticSensitive) {
         this.name = name;
+        this.front = front;
         this.size = size;
         this.noiseSensitivite = noiseSensitivite;
         this.eroticSensitive = eroticSensitive;
@@ -23,6 +28,14 @@ public class Booking {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public double getFront() {
+        return front;
+    }
+
+    public void setFront(double front) {
+        this.front = front;
     }
 
     public double getSize() {

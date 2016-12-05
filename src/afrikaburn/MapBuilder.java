@@ -2,6 +2,8 @@ package afrikaburn;
 
 import java.io.File;
 import javafx.collections.ObservableList;
+import javafx.fxml.FXML;
+import javafx.scene.control.Label;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
@@ -22,13 +24,15 @@ public class MapBuilder {
     private double xMin;
     private double xMax;
     private final int totalPolygons;
+    Label infoLabel;
 
     /**
-     * @Description: Reads the map from the file 
-     * (name must be afrikaburnmap.json) and loads the coordinates.
+     * @Description: Reads the map from the file (name must be
+     * afrikaburnmap.json) and loads the coordinates.
      */
-    MapBuilder() {
-        JSONReader reader 
+    MapBuilder(Label infoLabel) {
+        this.infoLabel = infoLabel;
+        JSONReader reader
                 = new JSONReader(new File("resources/afrikaburnmap.json"));
         polygons = reader.polygons();
         totalPolygons = reader.getTotalPolygons();
@@ -44,7 +48,7 @@ public class MapBuilder {
      */
     public Pane getGroup() {
         Pane canvas = new Pane();
-        
+
         for (Polygon current : polygons) {
             current.setFill(Color.LIGHTGREY);
             current.setStroke(Color.BLACK);
@@ -55,11 +59,14 @@ public class MapBuilder {
             current.setOnMouseExited((MouseEvent mouseEvent) -> {
                 current.setFill(Color.LIGHTGREY);
             });
+            current.setOnMouseClicked(e -> {
+                infoLabel.setText("Total Area: " + Math.round(area(current)*100)/100.0 + " m\u00B2" );
+            });
             canvas.getChildren().add(current);
         }
-        
+
         // The origin is in the top left hand corner, changes it to bottom left
-        canvas.getTransforms().add(new Rotate(180, GV.MAP_WIDTH / 2, 
+        canvas.getTransforms().add(new Rotate(-90, GV.MAP_WIDTH / 2,
                 GV.MAP_HEIGHT / 2));
         return canvas;
     }
@@ -99,16 +106,20 @@ public class MapBuilder {
      * to stretched by a factor of cos(phi) where phi is the center latitude of
      * the map to prevent warping.
      */
-    
     private void portMap() {
+        //Find the smallest edge of map
+        final double DEL_Y = Math.abs(yMax - yMin);
+        final double DEL_X = Math.abs(xMax - xMin);
+        final double BIGGEST_EDGE = DEL_X < DEL_Y ? DEL_Y : DEL_X;
+
         // Normalise the polygons
         for (int count = 0; count < totalPolygons; count++) {
             ObservableList<Double> tmpPolygon = polygons[count].getPoints();
             for (int coords = 0; coords < tmpPolygon.size(); coords += 2) {
                 tmpPolygon.set(coords, (tmpPolygon.get(coords) - xMin)
-                        / Math.abs(xMax - xMin) * GV.MAP_WIDTH);
+                        / BIGGEST_EDGE * GV.MAP_WIDTH);
                 tmpPolygon.set(coords + 1, (tmpPolygon.get(coords + 1) - yMin)
-                        / Math.abs(yMax - yMin) * GV.MAP_HEIGHT);
+                        / BIGGEST_EDGE * GV.MAP_HEIGHT);
             }
         }
     }
@@ -122,7 +133,7 @@ public class MapBuilder {
         for (int count = 0; count < totalPolygons; count++) {
             polygons[count].getTransforms().add(new Translate(deltaX, deltaY));
         }
-        
+
     }
 
     /**
@@ -152,14 +163,14 @@ public class MapBuilder {
      */
     public double area(Polygon bound) {
         double area = 0;
-        System.out.println(bound.getPoints());
-        for (int data = 0; data < bound.getPoints().size() - 5; data += 2) {
+        for (int data = 0; data < bound.getPoints().size() - 3; data += 2) {
             area -= (bound.getPoints().get(data) * bound.getPoints()
                     .get(data + 3));
             area += (bound.getPoints().get(data + 1) * bound.getPoints()
                     .get(data + 2));
         }
         area /= 2;
+        area *= GV.METER2MAP_RATIO;
         return Math.abs(area);
     }
 }

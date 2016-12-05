@@ -114,7 +114,7 @@ public class Controller implements Initializable {
     public void initialize(URL location, ResourceBundle resources) {
         //<< LOAD USER DATA FROM CSV FILE>>//
 
-        mapBuild = new MapBuilder();
+        mapBuild = new MapBuilder(infoLabel);
         map = mapBuild.getGroup();
 
         map.setOnMouseDragged(e -> {

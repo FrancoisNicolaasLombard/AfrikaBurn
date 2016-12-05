@@ -46,11 +46,18 @@ public class JSONReader {
                             && !token.replace(",", "").equals("0")
                             && !token.replace(",", "").equals("0.0")) {
                         token = token.replace(",", "");
+                        
+                        /*
+                        This method of mapping does not work.. rather using
+                        the 1:1 approximation when dealing with small areas 
+                        that x = longitude and y = latitude
+                        */
                         double lat = Double.parseDouble(token);
                         double lon = Double.parseDouble(input.next());
                         double x = cos(toRadians(lat)) * cos(toRadians(lon));
                         double y = cos(toRadians(lat)) * sin(toRadians(lon));
-                        polygons[currentPolygon].getPoints().addAll(x, y);
+                        
+                        polygons[currentPolygon].getPoints().addAll(lon, lat);
                     }
                 }
             }

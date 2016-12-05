@@ -12,11 +12,11 @@
 
 <!-- Only one controller -->
 
-<BorderPane fx:id="borderPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="900.0" style="-fx-background-color: #ffffff;" stylesheets="@Resources/Cobra.css" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1" fx:controller="afrikaburn.Controller">
+<BorderPane fx:id="borderPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="900.0" style="-fx-background-color: white;" stylesheets="@Resources/Cobra.css" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1" fx:controller="afrikaburn.Controller">
    <bottom>
       <HBox fx:id="labelBox" minHeight="-Infinity" prefHeight="29.0" prefWidth="900.0" BorderPane.alignment="CENTER">
          <children>
-            <Label fx:id="infoLabel" prefHeight="29.0" prefWidth="902.0" style="-fx-text-fill: white; -fx-background-color: #383838;" text="Label">
+            <Label fx:id="infoLabel" prefHeight="29.0" prefWidth="916.0" style="-fx-text-fill: white; -fx-background-color: #383838;" text="Label">
                <padding>
                   <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
                </padding></Label>
@@ -24,7 +24,7 @@
       </HBox>
    </bottom>
    <left>
-      <VBox fx:id="menuBar" prefHeight="571.0" prefWidth="173.0" BorderPane.alignment="CENTER">
+      <VBox fx:id="menuBar" prefHeight="571.0" prefWidth="173.0" style="-fx-background-color: #383838;" BorderPane.alignment="CENTER">
          <children>
             <Button maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" text="Map Layout" />
             <Button layoutX="10.0" layoutY="10.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" text="Manage Maps" />
