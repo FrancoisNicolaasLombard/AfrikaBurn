@@ -37,6 +37,7 @@ public class Controller implements Initializable {
     private double dragY = 0;
     private MapBuilder mapBuild;
     private Pane map;
+    private 
 
     // References to FXML components
     @FXML
