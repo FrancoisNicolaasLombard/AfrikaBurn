@@ -25,7 +25,6 @@ public class AfrikaBurn extends Application {
     // Overrides launch method from the Application Class
     @Override
     public void start(Stage primaryStage) throws Exception {
-        // Set on close request
         window = primaryStage;
         FXMLLoader loader = new FXMLLoader(getClass().getResource("View.fxml"));
         Parent root = (Parent)loader.load();

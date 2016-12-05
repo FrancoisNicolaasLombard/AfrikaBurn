@@ -24,10 +24,12 @@ public class MapBuilder {
     private final int totalPolygons;
 
     /**
-     * 
+     * @Description: Reads the map from the file 
+     * (name must be afrikaburnmap.json) and loads the coordinates.
      */
     MapBuilder() {
-        JSONReader reader = new JSONReader(new File("resources/afrikaburnmap.json"));
+        JSONReader reader 
+                = new JSONReader(new File("resources/afrikaburnmap.json"));
         polygons = reader.polygons();
         totalPolygons = reader.getTotalPolygons();
 
@@ -94,6 +96,7 @@ public class MapBuilder {
      * to stretched by a factor of cos(phi) where phi is the center latitude of
      * the map to prevent warping.
      */
+    
     private void portMap() {
         // Normalise the polygons
         for (int count = 0; count < totalPolygons; count++) {
@@ -108,9 +111,9 @@ public class MapBuilder {
     }
 
     /**
-     * 
+     *
      * @param deltaX
-     * @param deltaY 
+     * @param deltaY
      */
     public void dragMap(double deltaX, double deltaY) {
         for (int count = 0; count < totalPolygons; count++) {
@@ -119,7 +122,7 @@ public class MapBuilder {
     }
 
     /**
-     * 
+     *
      */
     public void zoomIn() {
         for (int count = 0; count < totalPolygons; count++) {
@@ -129,7 +132,7 @@ public class MapBuilder {
     }
 
     /**
-     * 
+     *
      */
     public void zoomOut() {
         for (int count = 0; count < totalPolygons; count++) {
@@ -137,18 +140,18 @@ public class MapBuilder {
             polygons[count].setScaleY(polygons[count].getScaleY() - 0.05);
         }
     }
-    
+
     /**
-     * 
+     *
      * @param bound
-     * @return 
+     * @return
      */
-    public double area(Polygon bound){
+    public double area(Polygon bound) {
         double area = 0;
         System.out.println(bound.getPoints());
-        for (int data = 0; data < bound.getPoints().size()-5; data+=2){
+        for (int data = 0; data < bound.getPoints().size() - 5; data += 2) {
             area -= (bound.getPoints().get(data) * bound.getPoints().get(data + 3));
-            area += (bound.getPoints().get(data+1) * bound.getPoints().get(data + 2));
+            area += (bound.getPoints().get(data + 1) * bound.getPoints().get(data + 2));
         }
         area /= 2;
         return Math.abs(area);
