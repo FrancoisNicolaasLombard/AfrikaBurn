@@ -2,6 +2,7 @@ package afrikaburn;
 
 import java.io.File;
 import javafx.collections.ObservableList;
+import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.input.DragEvent;
 import javafx.scene.input.Dragboard;
@@ -11,6 +12,8 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Line;
 import javafx.scene.shape.Polygon;
 import javafx.scene.transform.Rotate;
+import javafx.scene.transform.Scale;
+import javafx.scene.transform.Transform;
 import javafx.scene.transform.Translate;
 
 /**
@@ -25,8 +28,11 @@ public class MapController {
     private double yMax;
     private double xMin;
     private double xMax;
+    private double delX;
+    private double delY;
     private final int totalPolygons;
     private final Label infoLabel;
+    private Pane canvas;
 
     /**
      * @Description: Reads the map from the file (name must be
@@ -34,6 +40,8 @@ public class MapController {
      */
     MapController(Label infoLabel) {
         this.infoLabel = infoLabel;
+        delX = 0;
+        delY = 0;
         JSONReader reader
                 = new JSONReader(new File("resources/afrikaburnmap.json"));
         polygons = reader.polygons();
@@ -49,7 +57,7 @@ public class MapController {
      * @Description:
      */
     public Pane getGroup() {
-        Pane canvas = new Pane();
+        canvas = new Pane();
 
         for (Polygon current : polygons) {
             current.setFill(Color.LIGHTGREY);
@@ -65,9 +73,14 @@ public class MapController {
         return canvas;
     }
 
+    /**
+     *
+     * @param current
+     */
     private void setListeners(Polygon current) {
         current.setOnMouseClicked(e -> {
             infoLabel.setText("Total Area: " + Math.round(area(current) * 100) / 100.0 + " m\u00B2");
+            bookedArea(current, 0, e.getX(), e.getY());
         });
 
         current.setOnDragDropped(e -> {
@@ -156,30 +169,27 @@ public class MapController {
      * @param deltaY
      */
     public void dragMap(double deltaX, double deltaY) {
-        for (int count = 0; count < totalPolygons; count++) {
-            polygons[count].getTransforms().add(new Translate(deltaX, deltaY));
-        }
-
+        canvas.getChildren().forEach((component) -> {
+            component.getTransforms().add(new Translate(deltaX, deltaY));
+        });
+        delX += deltaX;
+        delY += deltaY;
     }
 
     /**
      *
      */
     public void zoomIn() {
-        for (int count = 0; count < totalPolygons; count++) {
-            polygons[count].setScaleX(polygons[count].getScaleX() + 0.05);
-            polygons[count].setScaleY(polygons[count].getScaleY() + 0.05);
-        }
+        canvas.setScaleX(canvas.getScaleX() * GV.ZOOM_AMOUNT);
+        canvas.setScaleY(canvas.getScaleY() * GV.ZOOM_AMOUNT);
     }
 
     /**
      *
      */
     public void zoomOut() {
-        for (int count = 0; count < totalPolygons; count++) {
-            polygons[count].setScaleX(polygons[count].getScaleX() - 0.05);
-            polygons[count].setScaleY(polygons[count].getScaleY() - 0.05);
-        }
+        canvas.setScaleX(canvas.getScaleX() / GV.ZOOM_AMOUNT);
+        canvas.setScaleY(canvas.getScaleY() / GV.ZOOM_AMOUNT);
     }
 
     /**
@@ -209,21 +219,27 @@ public class MapController {
      * @param mouseY
      * @return
      */
-    public Line bookedArea(Polygon plane, double area, double mouseX, double mouseY) {
+    public void bookedArea(Polygon plane, double area, double mouseX, double mouseY) {
         // Declare two points and use the first two as default
         GeoLine closest = new GeoLine(plane.getPoints().get(0), plane.getPoints().get(1),
                 plane.getPoints().get(2), plane.getPoints().get(3));
         double shortest = closest.cent2Point(mouseX, mouseY);
-        
+
         // Find the line closest to the mouse pointer
         for (int x = 2; x < plane.getPoints().size() - 2; x += 2) {
             GeoLine tmp = new GeoLine(plane.getPoints().get(x), plane.getPoints().get(x + 1),
-                plane.getPoints().get(x + 2), plane.getPoints().get(x + 3));
-            if (tmp.cent2Point(mouseX, mouseY) < shortest){
+                    plane.getPoints().get(x + 2), plane.getPoints().get(x + 3));
+            if (tmp.cent2Point(mouseX, mouseY) < shortest) {
                 closest = tmp;
                 shortest = tmp.cent2Point(mouseX, mouseY);
             }
         }
-        return new Line(closest.getX1(), closest.getY1(), closest.getX2(), closest.getY2());
+        Line draw = new Line(closest.getX1(),
+                closest.getY1(),
+                closest.getX2(),
+                closest.getY2());
+        draw.setStroke(Color.RED);
+        draw.getTransforms().addAll(new Translate(delX, delY));
+        canvas.getChildren().add(draw);
     }
 }

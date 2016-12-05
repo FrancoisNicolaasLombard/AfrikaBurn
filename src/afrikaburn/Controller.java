@@ -83,6 +83,7 @@ public class Controller implements Initializable {
      */
     @FXML
     public void mouseDown(MouseEvent m) {
+        
         dragging = true;
         dragX = m.getX();
         dragY = m.getY();
@@ -107,11 +108,9 @@ public class Controller implements Initializable {
     public void mouseZoom(ScrollEvent m) {
         double zoom = m.getDeltaY();
         if (zoom > 0) {
-            map.setScaleX(map.getScaleX() * GV.ZOOM_AMOUNT);
-            map.setScaleY(map.getScaleY() * GV.ZOOM_AMOUNT);
+            mapBuild.zoomIn();
         } else {
-            map.setScaleX(map.getScaleX() / GV.ZOOM_AMOUNT);
-            map.setScaleY(map.getScaleY() / GV.ZOOM_AMOUNT);
+            mapBuild.zoomOut();
         }
 
     }
