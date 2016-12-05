@@ -2,14 +2,13 @@ package afrikaburn;
 
 import java.io.File;
 import javafx.collections.ObservableList;
-import javafx.fxml.FXML;
 import javafx.scene.control.Label;
 import javafx.scene.input.DragEvent;
 import javafx.scene.input.Dragboard;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.input.TransferMode;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
+import javafx.scene.shape.Line;
 import javafx.scene.shape.Polygon;
 import javafx.scene.transform.Rotate;
 import javafx.scene.transform.Translate;
@@ -19,7 +18,7 @@ import javafx.scene.transform.Translate;
  * @Company: VASTech
  * @Description:
  */
-public class MapBuilder {
+public class MapController {
 
     final Polygon[] polygons;
     private double yMin;
@@ -33,7 +32,7 @@ public class MapBuilder {
      * @Description: Reads the map from the file (name must be
      * afrikaburnmap.json) and loads the coordinates.
      */
-    MapBuilder(Label infoLabel) {
+    MapController(Label infoLabel) {
         this.infoLabel = infoLabel;
         JSONReader reader
                 = new JSONReader(new File("resources/afrikaburnmap.json"));
@@ -199,5 +198,32 @@ public class MapBuilder {
         area /= 2;
         area *= GV.METER2MAP_RATIO;
         return Math.abs(area);
+    }
+
+    /**
+     * Find the line closest to the mouse.
+     *
+     * @param plane
+     * @param area
+     * @param mouseX
+     * @param mouseY
+     * @return
+     */
+    public Line bookedArea(Polygon plane, double area, double mouseX, double mouseY) {
+        // Declare two points and use the first two as default
+        GeoLine closest = new GeoLine(plane.getPoints().get(0), plane.getPoints().get(1),
+                plane.getPoints().get(2), plane.getPoints().get(3));
+        double shortest = closest.cent2Point(mouseX, mouseY);
+        
+        // Find the line closest to the mouse pointer
+        for (int x = 2; x < plane.getPoints().size() - 2; x += 2) {
+            GeoLine tmp = new GeoLine(plane.getPoints().get(x), plane.getPoints().get(x + 1),
+                plane.getPoints().get(x + 2), plane.getPoints().get(x + 3));
+            if (tmp.cent2Point(mouseX, mouseY) < shortest){
+                closest = tmp;
+                shortest = tmp.cent2Point(mouseX, mouseY);
+            }
+        }
+        return new Line(closest.getX1(), closest.getY1(), closest.getX2(), closest.getY2());
     }
 }

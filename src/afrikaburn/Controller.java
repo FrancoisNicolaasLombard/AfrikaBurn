@@ -44,7 +44,7 @@ public class Controller implements Initializable {
     private boolean dragging = false;
     private double dragX = 0;
     private double dragY = 0;
-    private MapBuilder mapBuild;
+    private MapController mapBuild;
     private Pane map;
     private Booking[] clients;
 
@@ -143,7 +143,7 @@ public class Controller implements Initializable {
         }
 
         //Build the map
-        mapBuild = new MapBuilder(infoLabel);
+        mapBuild = new MapController(infoLabel);
         map = mapBuild.getGroup();
 
         mapListeners();

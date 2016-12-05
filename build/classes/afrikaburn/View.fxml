@@ -24,17 +24,17 @@
       </HBox>
    </bottom>
    <left>
-      <VBox fx:id="menuBar" prefHeight="571.0" prefWidth="173.0" style="-fx-background-color: #383838;" BorderPane.alignment="CENTER">
+      <VBox fx:id="menuBar" prefHeight="574.0" prefWidth="173.0" style="-fx-background-color: #383838;" BorderPane.alignment="CENTER">
          <children>
             <Button maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" text="Map Layout" />
             <Button layoutX="10.0" layoutY="10.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" text="Manage Maps" />
             <Button layoutX="10.0" layoutY="35.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" text="Manage Bookings" />
-            <ScrollPane prefHeight="436.0" prefWidth="173.0" style="-fx-background-color: #383838;">
+            <ScrollPane prefHeight="452.0" prefWidth="173.0" style="-fx-background-color: #383838;">
                <content>
-                  <VBox fx:id="clientList" prefHeight="434.0" prefWidth="171.0" style="-fx-background-color: #383838;" />
+                  <VBox fx:id="clientList" prefHeight="450.0" prefWidth="171.0" style="-fx-background-color: #383838;" />
                </content>
             </ScrollPane>
-            <Button layoutX="10.0" layoutY="60.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#btnExit" text="Exit" />
+            <Button layoutX="10.0" layoutY="60.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#btnExit" prefWidth="173.0" text="Exit" />
          </children>
       </VBox>
    </left>
