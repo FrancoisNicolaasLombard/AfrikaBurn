@@ -21,6 +21,16 @@ public class Booking {
         this.noiseSensitivite = noiseSensitivite;
         this.eroticSensitive = eroticSensitive;
     }
+    
+    public String toString(){
+        return name + " " + size;
+    }
+    
+    /**
+     * @Author
+     * @return
+     * @Description: Getter and Setter methods
+     */
 
     public String getName() {
         return name;

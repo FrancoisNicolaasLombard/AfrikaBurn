@@ -2,11 +2,16 @@ package afrikaburn;
 
 import java.net.URL;
 import java.util.ResourceBundle;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
+import javafx.scene.control.ListView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.BorderPane;
@@ -14,7 +19,6 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
-import javafx.scene.transform.Translate;
 import javafx.stage.Stage;
 
 /**
@@ -37,9 +41,9 @@ public class Controller implements Initializable {
     private double dragY = 0;
     private MapBuilder mapBuild;
     private Pane map;
-    private 
+    private Booking[] clients;
 
-    // References to FXML components
+// References to FXML components
     @FXML
     BorderPane borderPane;
     @FXML
@@ -50,6 +54,8 @@ public class Controller implements Initializable {
     Region region;
     @FXML
     Label infoLabel;
+    @FXML
+    ListView clientList;
 
     /**
      *
@@ -114,10 +120,31 @@ public class Controller implements Initializable {
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         //<< LOAD USER DATA FROM CSV FILE>>//
+        CSVReader read = new CSVReader();
+        clients = read.getClients();
 
+        // Populate the listview with camper names
+        ObservableList<String> names = FXCollections.observableArrayList(read.getNames());
+        clientList.setItems(names);
+
+        clientList.getSelectionModel().selectedIndexProperty().addListener(e -> {
+                System.out.println(e.toString());
+        });
+
+        System.out.println(clientList.getSelectionModel().getSelectedItem());
+
+        //Build the map
         mapBuild = new MapBuilder(infoLabel);
         map = mapBuild.getGroup();
 
+        mapListeners();
+
+        // Stops the map from clipping over the other components
+        borderPane.setCenter(map);
+        map.toBack();
+    }
+
+    private void mapListeners() {
         map.setOnMouseDragged(e -> {
             mouseDrag(e);
         });
@@ -130,11 +157,6 @@ public class Controller implements Initializable {
         map.setOnScroll(e -> {
             mouseZoom(e);
         });
-
-        // Stops the map from clipping over the other components
-        borderPane.setCenter(map);
-
-        map.toBack();
     }
 
     /**

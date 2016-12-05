@@ -30,7 +30,7 @@
             <Button maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" text="Map Layout" />
             <Button layoutX="10.0" layoutY="10.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" text="Manage Maps" />
             <Button layoutX="10.0" layoutY="35.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" text="Manage Bookings" />
-            <ListView prefHeight="343.0" prefWidth="173.0" />
+            <ListView fx:id="clientList" prefHeight="343.0" prefWidth="173.0" />
             <Region fx:id="region" prefHeight="117.0" prefWidth="173.0" style="-fx-background-color: #383838;" VBox.vgrow="ALWAYS" />
             <Button layoutX="10.0" layoutY="60.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#btnExit" text="Exit" />
          </children>
