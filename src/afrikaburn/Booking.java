@@ -14,24 +14,25 @@ public class Booking {
     private boolean noiseSensitivite;
     private boolean eroticSensitive;
 
-    public Booking(String name, double front, double size, boolean noiseSensitivite, boolean eroticSensitive) {
+    public Booking(String name,
+            double front,
+            double size,
+            boolean noiseSensitivite,
+            boolean eroticSensitive) {
         this.name = name;
         this.front = front;
         this.size = size;
         this.noiseSensitivite = noiseSensitivite;
         this.eroticSensitive = eroticSensitive;
     }
-    
-    public String toString(){
+
+    public String toString() {
         return name + " " + size;
     }
-    
-    /**
-     * @Author
-     * @return
-     * @Description: Getter and Setter methods
-     */
 
+    /**
+     * @Author @return @Description: Getter and Setter methods
+     */
     public String getName() {
         return name;
     }

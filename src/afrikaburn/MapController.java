@@ -2,7 +2,6 @@ package afrikaburn;
 
 import java.io.File;
 import javafx.collections.ObservableList;
-import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.input.DragEvent;
 import javafx.scene.input.Dragboard;
@@ -12,8 +11,6 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Line;
 import javafx.scene.shape.Polygon;
 import javafx.scene.transform.Rotate;
-import javafx.scene.transform.Scale;
-import javafx.scene.transform.Transform;
 import javafx.scene.transform.Translate;
 
 /**
@@ -23,6 +20,7 @@ import javafx.scene.transform.Translate;
  */
 public class MapController {
 
+    // Class variables
     final Polygon[] polygons;
     private double yMin;
     private double yMax;
@@ -54,9 +52,9 @@ public class MapController {
     /**
      * @return @Author FN Lombard
      * @Company: VASTech
-     * @Description:
+     * @Description: This method builds the map and returns it to the controller
      */
-    public Pane getGroup() {
+    public Pane getMap() {
         canvas = new Pane();
 
         for (Polygon current : polygons) {
@@ -74,12 +72,14 @@ public class MapController {
     }
 
     /**
+     * This method neatens up the code and gives the polygons its listeners
      *
      * @param current
      */
     private void setListeners(Polygon current) {
         current.setOnMouseClicked(e -> {
-            infoLabel.setText("Total Area: " + Math.round(area(current) * 100) / 100.0 + " m\u00B2");
+            infoLabel.setText("Total Area: " + Math.round(area(current) * 100)
+                    / 100.0 + " m\u00B2");
             bookedArea(current, 0, e.getX(), e.getY());
         });
 
@@ -113,14 +113,14 @@ public class MapController {
     /**
      * @Author FN Lombard
      * @Company: VASTech
-     * @Description:
+     * @Description: The method finds the maximum and minimum x- and y-values of
+     * the polygons in order to normalize them.
      */
     private void minMax() {
         xMin = polygons[0].getPoints().get(0);
         yMin = polygons[0].getPoints().get(1);
         xMax = xMin;
         yMax = yMin;
-        System.out.println("Total Polygons: " + totalPolygons);
         for (int count = 0; count < totalPolygons; count++) {
             for (int coords = 0; coords < polygons[count].getPoints().size(); coords += 2) {
                 if (polygons[count].getPoints().get(coords + 1) > yMax) {
@@ -177,7 +177,7 @@ public class MapController {
     }
 
     /**
-     *
+     * This method zooms the canvas - not changing the size of the polygons
      */
     public void zoomIn() {
         canvas.setScaleX(canvas.getScaleX() * GV.ZOOM_AMOUNT);
@@ -185,7 +185,7 @@ public class MapController {
     }
 
     /**
-     *
+     * This method zooms the canvas - not changing the size of the polygons
      */
     public void zoomOut() {
         canvas.setScaleX(canvas.getScaleX() / GV.ZOOM_AMOUNT);
@@ -193,7 +193,8 @@ public class MapController {
     }
 
     /**
-     *
+     * This method uses a standard formula to determine the area of a irregular
+     * polygon.
      * @param bound
      * @return
      */
@@ -206,7 +207,7 @@ public class MapController {
                     .get(data + 2));
         }
         area /= 2;
-        area *= GV.METER2MAP_RATIO;
+        area *= GV.METER_SQUARED_2_MAP_RATIO;
         return Math.abs(area);
     }
 
@@ -217,7 +218,6 @@ public class MapController {
      * @param area
      * @param mouseX
      * @param mouseY
-     * @return
      */
     public void bookedArea(Polygon plane, double area, double mouseX, double mouseY) {
         // Declare two points and use the first two as default
@@ -234,6 +234,9 @@ public class MapController {
                 shortest = tmp.cent2Point(mouseX, mouseY);
             }
         }
+
+        // <-- INSERT CODE FOR DRAWING POLYGON -->
+        // <-- INSERT CODE FOR POLYGON LISTENERS -->
         Line draw = new Line(closest.getX1(),
                 closest.getY1(),
                 closest.getX2(),

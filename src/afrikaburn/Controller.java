@@ -2,16 +2,11 @@ package afrikaburn;
 
 import java.net.URL;
 import java.util.ResourceBundle;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
-import javafx.scene.control.ListView;
 import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.Dragboard;
 import javafx.scene.input.MouseEvent;
@@ -48,7 +43,7 @@ public class Controller implements Initializable {
     private Pane map;
     private Booking[] clients;
 
-// References to FXML components
+    // References to FXML components
     @FXML
     BorderPane borderPane;
     @FXML
@@ -83,7 +78,7 @@ public class Controller implements Initializable {
      */
     @FXML
     public void mouseDown(MouseEvent m) {
-        
+
         dragging = true;
         dragX = m.getX();
         dragY = m.getY();
@@ -143,7 +138,7 @@ public class Controller implements Initializable {
 
         //Build the map
         mapBuild = new MapController(infoLabel);
-        map = mapBuild.getGroup();
+        map = mapBuild.getMap();
 
         mapListeners();
 
@@ -152,6 +147,9 @@ public class Controller implements Initializable {
         map.toBack();
     }
 
+    /**
+     * All of the listeners used for the map canvas
+     */
     private void mapListeners() {
         map.setOnMouseDragged(e -> {
             mouseDrag(e);

@@ -10,9 +10,11 @@ import java.util.logging.Logger;
  *
  * @Author: FN Lombard
  * @Company: VASTech
- * @Description:
+ * @Description: This class reads in the clients from a CSV file and creates
+ * booking entries for each.
  */
 public class CSVReader {
+
     private Booking[] client;
     private int nrClients;
 
@@ -34,12 +36,12 @@ public class CSVReader {
             Logger.getLogger(CSVReader.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
-    
-    private int nrClients(){
+
+    private int nrClients() {
         nrClients = 0;
         try {
             try (Scanner input = new Scanner(new File("resources/campers.csv"))) {
-                while(input.hasNextLine()){
+                while (input.hasNextLine()) {
                     input.nextLine();
                     nrClients++;
                 }
@@ -49,10 +51,10 @@ public class CSVReader {
         }
         return nrClients;
     }
-    
-    public String[] getNames(){
+
+    public String[] getNames() {
         String[] names = new String[client.length];
-        for (int x = 0; x < client.length; x++){
+        for (int x = 0; x < client.length; x++) {
             names[x] = client[x].getName();
         }
         return names;
@@ -61,8 +63,8 @@ public class CSVReader {
     public Booking[] getClients() {
         return client;
     }
-    
-    public int getNrClients(){
+
+    public int getNrClients() {
         return nrClients;
     }
 }

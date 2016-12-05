@@ -13,7 +13,10 @@ import java.util.regex.Pattern;
 
 /**
  *
- * @author User Read dem files
+ * @author FN Lombard
+ * @company VASTech
+ * @description This class reads in a map in JSON formal and assigns polygons
+ * for each piece of land. 
  */
 public class JSONReader {
 
@@ -27,7 +30,7 @@ public class JSONReader {
     }
 
     /**
-     *
+     * Builds all of the polygons with the JSON file
      * @return
      */
     public Polygon[] polygons() {
@@ -69,7 +72,7 @@ public class JSONReader {
     }
 
     /**
-     * 
+     * Counts the total entries in the JSON file
      */
     private void countPolygons() {
         int entries = 0;
@@ -89,7 +92,7 @@ public class JSONReader {
     }
 
     /**
-     * 
+     * This method returns the number of land
      * @return 
      */
     public int getTotalPolygons() {
