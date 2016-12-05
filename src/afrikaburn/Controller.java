@@ -12,13 +12,18 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
+import javafx.scene.input.ClipboardContent;
+import javafx.scene.input.Dragboard;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.ScrollEvent;
+import javafx.scene.input.TransferMode;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
+import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
 /**
@@ -55,7 +60,7 @@ public class Controller implements Initializable {
     @FXML
     Label infoLabel;
     @FXML
-    ListView clientList;
+    VBox clientList;
 
     /**
      *
@@ -124,14 +129,18 @@ public class Controller implements Initializable {
         clients = read.getClients();
 
         // Populate the listview with camper names
-        ObservableList<String> names = FXCollections.observableArrayList(read.getNames());
-        clientList.setItems(names);
-
-        clientList.getSelectionModel().selectedIndexProperty().addListener(e -> {
-                System.out.println(e.toString());
-        });
-
-        System.out.println(clientList.getSelectionModel().getSelectedItem());
+        for (Booking client : clients) {
+            Text tmpClient = new Text(client.getName());
+            tmpClient.setFill(Color.WHITE);
+            tmpClient.setOnDragDetected(e -> {
+                Dragboard db = tmpClient.startDragAndDrop(TransferMode.COPY);
+                ClipboardContent content = new ClipboardContent();
+                content.putString(tmpClient.toString());
+                db.setContent(content);
+                e.consume();
+            });
+            clientList.getChildren().add(tmpClient);
+        }
 
         //Build the map
         mapBuild = new MapBuilder(infoLabel);

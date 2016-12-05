@@ -4,7 +4,10 @@ import java.io.File;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
+import javafx.scene.input.DragEvent;
+import javafx.scene.input.Dragboard;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.input.TransferMode;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Polygon;
@@ -24,7 +27,7 @@ public class MapBuilder {
     private double xMin;
     private double xMax;
     private final int totalPolygons;
-    Label infoLabel;
+    private final Label infoLabel;
 
     /**
      * @Description: Reads the map from the file (name must be
@@ -53,15 +56,7 @@ public class MapBuilder {
             current.setFill(Color.LIGHTGREY);
             current.setStroke(Color.BLACK);
             current.setStrokeWidth(1);
-            current.setOnMouseEntered((MouseEvent mouseEvent) -> {
-                current.setFill(Color.BLUE);
-            });
-            current.setOnMouseExited((MouseEvent mouseEvent) -> {
-                current.setFill(Color.LIGHTGREY);
-            });
-            current.setOnMouseClicked(e -> {
-                infoLabel.setText("Total Area: " + Math.round(area(current)*100)/100.0 + " m\u00B2" );
-            });
+            setListeners(current);
             canvas.getChildren().add(current);
         }
 
@@ -69,6 +64,38 @@ public class MapBuilder {
         canvas.getTransforms().add(new Rotate(-90, GV.MAP_WIDTH / 2,
                 GV.MAP_HEIGHT / 2));
         return canvas;
+    }
+
+    private void setListeners(Polygon current) {
+        current.setOnMouseClicked(e -> {
+            infoLabel.setText("Total Area: " + Math.round(area(current) * 100) / 100.0 + " m\u00B2");
+        });
+
+        current.setOnDragDropped(e -> {
+            Dragboard db = e.getDragboard();
+            boolean success = false;
+
+            if (db.hasString()) {
+                String nodeId = db.getString();
+                System.out.println(nodeId);
+                success = true;
+            }
+            e.setDropCompleted(success);
+            e.consume();
+        });
+
+        current.setOnDragOver((DragEvent e) -> {
+            if (e.getGestureSource() != current
+                    && e.getDragboard().hasString()) {
+                e.acceptTransferModes(TransferMode.COPY);
+                current.setFill(Color.BLUE);
+            }
+            e.consume();
+        });
+
+        current.setOnDragExited(e -> {
+            current.setFill(Color.LIGHTGREY);
+        });
     }
 
     /**
