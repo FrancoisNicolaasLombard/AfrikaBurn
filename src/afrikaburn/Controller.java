@@ -14,6 +14,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
+import javafx.scene.transform.Translate;
 import javafx.stage.Stage;
 
 /**
@@ -57,9 +58,7 @@ public class Controller implements Initializable {
     @FXML
     public void mouseDrag(MouseEvent m) {
         if (dragging) {
-            mapBuild.dragMap((m.getX() - dragX) / map.getScaleX(),
-                    (m.getY() - dragY) / map.getScaleY());
-
+            mapBuild.dragMap((m.getX() - dragX), (m.getY() - dragY));
             dragX = m.getX();
             dragY = m.getY();
         }
@@ -98,17 +97,9 @@ public class Controller implements Initializable {
         if (zoom > 0) {
             map.setScaleX(map.getScaleX() * GV.ZOOM_AMOUNT);
             map.setScaleY(map.getScaleY() * GV.ZOOM_AMOUNT);
-            map.setTranslateX(-m.getX() * map.getScaleX()
-                    * (1 - 1 / GV.ZOOM_AMOUNT));
-            map.setTranslateY(-m.getY() * map.getScaleY()
-                    * (1 - 1 / GV.ZOOM_AMOUNT));
         } else {
             map.setScaleX(map.getScaleX() / GV.ZOOM_AMOUNT);
             map.setScaleY(map.getScaleY() / GV.ZOOM_AMOUNT);
-            map.setTranslateX(-m.getX() * map.getScaleX()
-                    * (1 - 1 / GV.ZOOM_AMOUNT));
-            map.setTranslateY(-m.getY() * map.getScaleY()
-                    * (1 - 1 / GV.ZOOM_AMOUNT));
         }
 
     }

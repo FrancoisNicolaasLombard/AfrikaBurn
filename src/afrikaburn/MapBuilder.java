@@ -17,10 +17,10 @@ import javafx.scene.transform.Translate;
 public class MapBuilder {
 
     final Polygon[] polygons;
-    private double latMin;
-    private double latMax;
-    private double lonMin;
-    private double lonMax;
+    private double yMin;
+    private double yMax;
+    private double xMin;
+    private double xMax;
     private final int totalPolygons;
 
     /**
@@ -44,13 +44,12 @@ public class MapBuilder {
      */
     public Pane getGroup() {
         Pane canvas = new Pane();
+        
         for (Polygon current : polygons) {
-            current.getTransforms().add(new Rotate(-90, GV.MAP_WIDTH / 2, GV.MAP_HEIGHT / 2));
             current.setFill(Color.LIGHTGREY);
             current.setStroke(Color.BLACK);
             current.setStrokeWidth(1);
             current.setOnMouseEntered((MouseEvent mouseEvent) -> {
-                System.out.println(area(current));
                 current.setFill(Color.BLUE);
             });
             current.setOnMouseExited((MouseEvent mouseEvent) -> {
@@ -58,6 +57,10 @@ public class MapBuilder {
             });
             canvas.getChildren().add(current);
         }
+        
+        // The origin is in the top left hand corner, changes it to bottom left
+        canvas.getTransforms().add(new Rotate(180, GV.MAP_WIDTH / 2, 
+                GV.MAP_HEIGHT / 2));
         return canvas;
     }
 
@@ -67,22 +70,22 @@ public class MapBuilder {
      * @Description:
      */
     private void minMax() {
-        lonMin = polygons[0].getPoints().get(0);
-        latMin = polygons[0].getPoints().get(1);
-        lonMax = lonMin;
-        latMax = latMin;
+        xMin = polygons[0].getPoints().get(0);
+        yMin = polygons[0].getPoints().get(1);
+        xMax = xMin;
+        yMax = yMin;
         System.out.println("Total Polygons: " + totalPolygons);
         for (int count = 0; count < totalPolygons; count++) {
             for (int coords = 0; coords < polygons[count].getPoints().size(); coords += 2) {
-                if (polygons[count].getPoints().get(coords + 1) > latMax) {
-                    latMax = polygons[count].getPoints().get(coords + 1);
-                } else if (polygons[count].getPoints().get(coords + 1) < latMin) {
-                    latMin = polygons[count].getPoints().get(coords + 1);
+                if (polygons[count].getPoints().get(coords + 1) > yMax) {
+                    yMax = polygons[count].getPoints().get(coords + 1);
+                } else if (polygons[count].getPoints().get(coords + 1) < yMin) {
+                    yMin = polygons[count].getPoints().get(coords + 1);
                 }
-                if (polygons[count].getPoints().get(coords) > lonMax) {
-                    lonMax = polygons[count].getPoints().get(coords);
-                } else if (polygons[count].getPoints().get(coords) < lonMin) {
-                    lonMin = polygons[count].getPoints().get(coords);
+                if (polygons[count].getPoints().get(coords) > xMax) {
+                    xMax = polygons[count].getPoints().get(coords);
+                } else if (polygons[count].getPoints().get(coords) < xMin) {
+                    xMin = polygons[count].getPoints().get(coords);
                 }
             }
         }
@@ -102,10 +105,10 @@ public class MapBuilder {
         for (int count = 0; count < totalPolygons; count++) {
             ObservableList<Double> tmpPolygon = polygons[count].getPoints();
             for (int coords = 0; coords < tmpPolygon.size(); coords += 2) {
-                tmpPolygon.set(coords, (tmpPolygon.get(coords) - lonMin)
-                        / Math.abs(lonMax - lonMin) * GV.MAP_HEIGHT);
-                tmpPolygon.set(coords + 1, (tmpPolygon.get(coords + 1) - latMin)
-                        / Math.abs(latMax - latMin) * GV.MAP_WIDTH);
+                tmpPolygon.set(coords, (tmpPolygon.get(coords) - xMin)
+                        / Math.abs(xMax - xMin) * GV.MAP_WIDTH);
+                tmpPolygon.set(coords + 1, (tmpPolygon.get(coords + 1) - yMin)
+                        / Math.abs(yMax - yMin) * GV.MAP_HEIGHT);
             }
         }
     }
@@ -117,8 +120,9 @@ public class MapBuilder {
      */
     public void dragMap(double deltaX, double deltaY) {
         for (int count = 0; count < totalPolygons; count++) {
-            polygons[count].getTransforms().add(new Translate(-deltaY, deltaX));
+            polygons[count].getTransforms().add(new Translate(deltaX, deltaY));
         }
+        
     }
 
     /**
@@ -150,8 +154,10 @@ public class MapBuilder {
         double area = 0;
         System.out.println(bound.getPoints());
         for (int data = 0; data < bound.getPoints().size() - 5; data += 2) {
-            area -= (bound.getPoints().get(data) * bound.getPoints().get(data + 3));
-            area += (bound.getPoints().get(data + 1) * bound.getPoints().get(data + 2));
+            area -= (bound.getPoints().get(data) * bound.getPoints()
+                    .get(data + 3));
+            area += (bound.getPoints().get(data + 1) * bound.getPoints()
+                    .get(data + 2));
         }
         area /= 2;
         return Math.abs(area);
