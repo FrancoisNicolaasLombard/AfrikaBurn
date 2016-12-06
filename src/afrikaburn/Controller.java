@@ -137,8 +137,8 @@ public class Controller implements Initializable {
         }
 
         //Build the map
-        mapBuild = new MapController(infoLabel);
-        map = mapBuild.getMap();
+        map = new Pane();
+        mapBuild = new MapController(infoLabel, map);
 
         mapListeners();
 

@@ -40,14 +40,15 @@ public final class MapController {
     private double delY;
     private final int totalPolygons;
     private final Label infoLabel;
-    private Pane canvas;
+    private final Pane canvas;
 
     /**
      * @Description: Reads the map from the file (name must be
      * afrikaburnmap.json) and loads the coordinates.
      */
-    MapController(Label infoLabel) {
+    MapController(Label infoLabel, Pane map) {
         this.infoLabel = infoLabel;
+        this.canvas = map;
         delX = 0;
         delY = 0;
         JSONReader reader
@@ -57,7 +58,9 @@ public final class MapController {
 
         minMax();
         portMap();
+
         increaseResolution();
+        getMap();
     }
 
     /**
@@ -65,12 +68,9 @@ public final class MapController {
      * @Company: VASTech
      * @Description: This method builds the map and returns it to the controller
      */
-    public Pane getMap() {
-        canvas = new Pane();
-
+    public void getMap() {
         for (Polygon current : polygons) {
             current.setFill(Color.LIGHTGREY);
-            //current.setFill(Color.rgb(0, 0, 0, 0));
             current.setStroke(Color.BLACK);
             current.setStrokeWidth(0.4);
             setListeners(current);
@@ -80,7 +80,6 @@ public final class MapController {
         // The origin is in the top left hand corner, changes it to bottom left
         canvas.getTransforms().add(new Rotate(-90, GV.MAP_WIDTH / 2,
                 GV.MAP_HEIGHT / 2));
-        return canvas;
     }
 
     /**
@@ -304,10 +303,9 @@ public final class MapController {
      */
     public void increaseResolution() {
         for (Polygon polygon : polygons) {
-            //Polygon polygon = polygons[0];
+            Polygon tmp = new Polygon();
             double x1, x2, y1, y2, length;
             int originalPoints = polygon.getPoints().size(), tracker = 0;
-            //System.out.println(polygon.getPoints());
 
             for (int i = 0; i < originalPoints - 3; i += 2) {
                 x1 = polygon.getPoints().get(i + tracker);
@@ -315,33 +313,40 @@ public final class MapController {
                 x2 = polygon.getPoints().get(i + 2 + tracker);
                 y2 = polygon.getPoints().get(i + 3 + tracker);
 
+                tmp.getPoints().addAll(x1, y1);
+
                 // Add one point for each meter on the line - exlude first and last points.
                 length = x2 - x1;
                 double m = (y2 - y1) / length;
                 double c = y2 - m * x2;
-                double x_step = length / round(length - 0.5);
-                x_step = 1;
                 int sign = (int) (length / abs(length));
-                System.out.println("Start: " + x1 + " " + y1);
-                for (int j = 1; j < abs(length); j++) {
-                    /*
-                if (m == 0) {
-                    //polygon.getPoints().add(i + 1 + tracker++, x1);
-                    //polygon.getPoints().add(i + 1 + tracker++, y1 + j);
-                } else if (m == NaN) {
-                    //polygon.getPoints().add(i + 1 + tracker++, j + x1);
-                    //polygon.getPoints().add(i + 1 + tracker++, y1);
-                } else {
-                     */
-                    polygon.getPoints().add(i + 1 + tracker++, m * (j * sign + x1) + c);
-                    polygon.getPoints().add(i + 1 + tracker++, j * sign + x1);
-                    System.out.println((j * sign + x1) + " " + (m * (j * sign + x1) + c));
-                    // }
+                Circle dot = new Circle();
+                dot.setCenterX(x1);
+                dot.setCenterY(y1);
+                dot.setRadius(1.1);
+                dot.setFill(Color.RED);
+                canvas.getChildren().add(dot);
+                for (int j = 1; j < abs(length) - 1; j++) {
+                    if (m == 0) {
+                        tmp.getPoints().addAll(x1, y1 + j);
+                    } else if (m == NaN) {
+                        tmp.getPoints().addAll(j + x1, y1);
+                    } else {
+                        tmp.getPoints().addAll(j * sign + x1, m * (j * sign + x1) + c);
+
+                        Circle dots = new Circle();
+                        dots.setCenterX(j * sign + x1);
+                        dots.setCenterY(m * (j * sign + x1) + c);
+                        dots.setRadius(1.1);
+                        dots.setFill(Color.AQUA);
+                        canvas.getChildren().add(dots);
+                    }
                 }
-                System.out.println("End: " + x2 + " " + y2);
             }
-            System.out.println();
-            System.out.println(polygon.getPoints());
+            //tmp.setStroke(Color.DARKGOLDENROD);
+            // canvas.getChildren().add(tmp);
+            polygon.getPoints().setAll(tmp.getPoints());
+            polygon = tmp;
         }
     }
 }
