@@ -1,6 +1,15 @@
 package afrikaburn;
 
 import java.io.File;
+import static java.lang.Double.NaN;
+import static java.lang.Math.abs;
+import static java.lang.Math.atan;
+import static java.lang.Math.cos;
+import static java.lang.Math.pow;
+import static java.lang.Math.round;
+import static java.lang.Math.sin;
+import static java.lang.Math.sqrt;
+import static java.lang.Math.toDegrees;
 import javafx.collections.ObservableList;
 import javafx.scene.control.Label;
 import javafx.scene.input.DragEvent;
@@ -8,6 +17,7 @@ import javafx.scene.input.Dragboard;
 import javafx.scene.input.TransferMode;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
+import javafx.scene.shape.Circle;
 import javafx.scene.shape.Line;
 import javafx.scene.shape.Polygon;
 import javafx.scene.transform.Rotate;
@@ -18,7 +28,7 @@ import javafx.scene.transform.Translate;
  * @Company: VASTech
  * @Description:
  */
-public class MapController {
+public final class MapController {
 
     // Class variables
     final Polygon[] polygons;
@@ -47,6 +57,7 @@ public class MapController {
 
         minMax();
         portMap();
+        increaseResolution();
     }
 
     /**
@@ -59,8 +70,9 @@ public class MapController {
 
         for (Polygon current : polygons) {
             current.setFill(Color.LIGHTGREY);
+            //current.setFill(Color.rgb(0, 0, 0, 0));
             current.setStroke(Color.BLACK);
-            current.setStrokeWidth(1);
+            current.setStrokeWidth(0.4);
             setListeners(current);
             canvas.getChildren().add(current);
         }
@@ -80,7 +92,7 @@ public class MapController {
         current.setOnMouseClicked(e -> {
             infoLabel.setText("Total Area: " + Math.round(area(current) * 100)
                     / 100.0 + " m\u00B2");
-            bookedArea(current, 0, e.getX(), e.getY());
+            bookedArea(current, 10, 100, e.getX(), e.getY());
         });
 
         current.setOnDragDropped(e -> {
@@ -195,6 +207,7 @@ public class MapController {
     /**
      * This method uses a standard formula to determine the area of a irregular
      * polygon.
+     *
      * @param bound
      * @return
      */
@@ -219,7 +232,7 @@ public class MapController {
      * @param mouseX
      * @param mouseY
      */
-    public void bookedArea(Polygon plane, double area, double mouseX, double mouseY) {
+    public void bookedArea(Polygon plane, double faceLength, double area, double mouseX, double mouseY) {
         // Declare two points and use the first two as default
         GeoLine closest = new GeoLine(plane.getPoints().get(0), plane.getPoints().get(1),
                 plane.getPoints().get(2), plane.getPoints().get(3));
@@ -235,6 +248,36 @@ public class MapController {
             }
         }
 
+        infoLabel.setText(infoLabel.getText() + " " + "Line length: "
+                + Math.round(closest.getLength() * GV.METER_2_MAP_RATIO * 100)
+                / 100.0 + " m");
+
+        // Find the closest point to the mouse pointer
+        double m1 = gradient(closest);
+        double m2 = -1 / m1;
+
+        //<-- Better code for looking for absolute closest line -->
+        // Case exception for a horizontal line
+        double xi, yi;
+        if (m2 == 0) {
+            xi = closest.getCent()[0];
+            yi = mouseY;
+        } else if (m1 == 0) {
+            xi = mouseX;
+            yi = closest.getCent()[1];
+        } else {
+            double cc = closest.getCent()[1] - m1 * closest.getCent()[0];
+            double cm = mouseY - m2 * mouseX;
+            xi = (cm - cc) / (m1 - m2);
+            yi = m1 * xi + cc;
+        }
+
+        Circle dot = new Circle();
+        dot.setCenterX(xi);
+        dot.setCenterY(yi);
+        dot.setRadius(1.1);
+        dot.setFill(Color.GREEN);
+
         // <-- INSERT CODE FOR DRAWING POLYGON -->
         // <-- INSERT CODE FOR POLYGON LISTENERS -->
         Line draw = new Line(closest.getX1(),
@@ -242,7 +285,63 @@ public class MapController {
                 closest.getX2(),
                 closest.getY2());
         draw.setStroke(Color.RED);
+        draw.setStrokeWidth(0.5);
+
+        // Add all drawn components
         draw.getTransforms().addAll(new Translate(delX, delY));
-        canvas.getChildren().add(draw);
+        dot.getTransforms().addAll(new Translate(delX, delY));
+        canvas.getChildren().addAll(draw, dot);
+    }
+
+    private double gradient(GeoLine line) {
+        double dy = line.getY2() - line.getY1();
+        double dx = line.getX2() - line.getX1();
+        return dy / dx;
+    }
+
+    /**
+     * Add resolution
+     */
+    public void increaseResolution() {
+        for (Polygon polygon : polygons) {
+            //Polygon polygon = polygons[0];
+            double x1, x2, y1, y2, length;
+            int originalPoints = polygon.getPoints().size(), tracker = 0;
+            //System.out.println(polygon.getPoints());
+
+            for (int i = 0; i < originalPoints - 3; i += 2) {
+                x1 = polygon.getPoints().get(i + tracker);
+                y1 = polygon.getPoints().get(i + 1 + tracker);
+                x2 = polygon.getPoints().get(i + 2 + tracker);
+                y2 = polygon.getPoints().get(i + 3 + tracker);
+
+                // Add one point for each meter on the line - exlude first and last points.
+                length = x2 - x1;
+                double m = (y2 - y1) / length;
+                double c = y2 - m * x2;
+                double x_step = length / round(length - 0.5);
+                x_step = 1;
+                int sign = (int) (length / abs(length));
+                System.out.println("Start: " + x1 + " " + y1);
+                for (int j = 1; j < abs(length); j++) {
+                    /*
+                if (m == 0) {
+                    //polygon.getPoints().add(i + 1 + tracker++, x1);
+                    //polygon.getPoints().add(i + 1 + tracker++, y1 + j);
+                } else if (m == NaN) {
+                    //polygon.getPoints().add(i + 1 + tracker++, j + x1);
+                    //polygon.getPoints().add(i + 1 + tracker++, y1);
+                } else {
+                     */
+                    polygon.getPoints().add(i + 1 + tracker++, m * (j * sign + x1) + c);
+                    polygon.getPoints().add(i + 1 + tracker++, j * sign + x1);
+                    System.out.println((j * sign + x1) + " " + (m * (j * sign + x1) + c));
+                    // }
+                }
+                System.out.println("End: " + x2 + " " + y2);
+            }
+            System.out.println();
+            System.out.println(polygon.getPoints());
+        }
     }
 }

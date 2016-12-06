@@ -1,6 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<!-- Import all classes -->
+<!-- 
+    Author: FN Lombard
+    Company: VASTECH
+    Description: This sets up the GUI for the application with the use of
+    Scene Builder V 8.2.0
+-->
 
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
