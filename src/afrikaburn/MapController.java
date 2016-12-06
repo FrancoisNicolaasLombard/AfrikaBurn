@@ -72,7 +72,7 @@ public final class MapController {
         for (Polygon current : polygons) {
             current.setFill(Color.LIGHTGREY);
             current.setStroke(Color.BLACK);
-            current.setStrokeWidth(0.4);
+            current.setStrokeWidth(0.25);
             setListeners(current);
             canvas.getChildren().add(current);
         }
@@ -274,7 +274,7 @@ public final class MapController {
         Circle dot = new Circle();
         dot.setCenterX(xi);
         dot.setCenterY(yi);
-        dot.setRadius(1.1);
+        dot.setRadius(0.8);
         dot.setFill(Color.GREEN);
 
         // <-- INSERT CODE FOR DRAWING POLYGON -->
@@ -304,7 +304,7 @@ public final class MapController {
     public void increaseResolution() {
         for (Polygon polygon : polygons) {
             Polygon tmp = new Polygon();
-            double x1, x2, y1, y2, length;
+            double x1, x2, y1, y2, x_len, y_len;
             int originalPoints = polygon.getPoints().size(), tracker = 0;
 
             for (int i = 0; i < originalPoints - 3; i += 2) {
@@ -316,35 +316,71 @@ public final class MapController {
                 tmp.getPoints().addAll(x1, y1);
 
                 // Add one point for each meter on the line - exlude first and last points.
-                length = x2 - x1;
-                double m = (y2 - y1) / length;
-                double c = y2 - m * x2;
-                int sign = (int) (length / abs(length));
-                Circle dot = new Circle();
-                dot.setCenterX(x1);
-                dot.setCenterY(y1);
-                dot.setRadius(1.1);
-                dot.setFill(Color.RED);
-                canvas.getChildren().add(dot);
-                for (int j = 1; j < abs(length) - 1; j++) {
-                    if (m == 0) {
-                        tmp.getPoints().addAll(x1, y1 + j);
-                    } else if (m == NaN) {
-                        tmp.getPoints().addAll(j + x1, y1);
-                    } else {
-                        tmp.getPoints().addAll(j * sign + x1, m * (j * sign + x1) + c);
+                x_len = x2 - x1;
+                y_len = y2 - y1;
 
+                double m = y_len / x_len;
+                double c = y2 - m * x2;
+                int x_sign = (int) (x_len / abs(x_len));
+                int y_sign = (int) (y_len / abs(y_len));
+
+                // X-Dimension Resolution
+                for (int j = 0; j < abs(x_len); j+=2) {
+                    if (m == 0) {
+                        tmp.getPoints().addAll(j * x_sign + x1, y1);
                         Circle dots = new Circle();
-                        dots.setCenterX(j * sign + x1);
-                        dots.setCenterY(m * (j * sign + x1) + c);
-                        dots.setRadius(1.1);
+                        dots.setCenterX(j * x_sign + x1);
+                        dots.setCenterY(y1);
+                        dots.setRadius(0.5);
+                        dots.setFill(Color.AQUA);
+                        canvas.getChildren().add(dots);
+                    } else if (m == NaN) {
+                        tmp.getPoints().addAll(x1, y1 + j * x_sign);
+                        Circle dots = new Circle();
+                        dots.setCenterX(x1);
+                        dots.setCenterY(y1 + j * x_sign);
+                        dots.setRadius(0.5);
+                        dots.setFill(Color.AQUA);
+                        canvas.getChildren().add(dots);
+                    } else {
+                        tmp.getPoints().addAll(j * x_sign + x1, m * (j * x_sign + x1) + c);
+                        Circle dots = new Circle();
+                        dots.setCenterX(j * x_sign + x1);
+                        dots.setCenterY(m * (j * x_sign + x1) + c);
+                        dots.setRadius(0.5);
+                        dots.setFill(Color.AQUA);
+                        canvas.getChildren().add(dots);
+                    }
+                }
+                // Y-Dimension Resolution
+                for (int j = 0; j < abs(y_len); j+=2) {
+                    if (1 / m == 0) {
+                        tmp.getPoints().addAll(x1, y1 + j * y_sign);
+                        Circle dots = new Circle();
+                        dots.setCenterX(x1);
+                        dots.setCenterY(y1 + j * y_sign);
+                        dots.setRadius(0.5);
+                        dots.setFill(Color.AQUA);
+                        canvas.getChildren().add(dots);
+                    } else if (1 / m == NaN) {
+                        tmp.getPoints().addAll(j * y_sign + x1, y1);
+                        Circle dots = new Circle();
+                        dots.setCenterX(j * y_sign + x1);
+                        dots.setCenterY(y1);
+                        dots.setRadius(0.5);
+                        dots.setFill(Color.AQUA);
+                        canvas.getChildren().add(dots);
+                    } else {
+                        tmp.getPoints().addAll(1 / m * (j * y_sign + y1 - c), j * y_sign + y1);
+                        Circle dots = new Circle();
+                        dots.setCenterX(1 / m * (j * y_sign + y1 - c));
+                        dots.setCenterY(j * y_sign + y1);
+                        dots.setRadius(0.5);
                         dots.setFill(Color.AQUA);
                         canvas.getChildren().add(dots);
                     }
                 }
             }
-            //tmp.setStroke(Color.DARKGOLDENROD);
-            // canvas.getChildren().add(tmp);
             polygon.getPoints().setAll(tmp.getPoints());
             polygon = tmp;
         }
