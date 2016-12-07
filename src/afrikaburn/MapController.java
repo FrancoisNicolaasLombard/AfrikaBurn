@@ -312,9 +312,6 @@ public final class MapController {
                 y1 = polygon.getPoints().get(i + 1 + tracker);
                 x2 = polygon.getPoints().get(i + 2 + tracker);
                 y2 = polygon.getPoints().get(i + 3 + tracker);
-
-                tmp.getPoints().addAll(x1, y1);
-
                 // Add one point for each meter on the line - exlude first and last points.
                 x_len = x2 - x1;
                 y_len = y2 - y1;
@@ -325,35 +322,20 @@ public final class MapController {
                 int y_sign = (int) (y_len / abs(y_len));
 
                 // X-Dimension Resolution
-                for (int j = 0; j < abs(x_len); j+=2) {
+                for (int j = 0; j < abs(x_len); j += 2) {
                     if (m == 0) {
                         tmp.getPoints().addAll(j * x_sign + x1, y1);
-                        Circle dots = new Circle();
-                        dots.setCenterX(j * x_sign + x1);
-                        dots.setCenterY(y1);
-                        dots.setRadius(0.5);
-                        dots.setFill(Color.AQUA);
-                        canvas.getChildren().add(dots);
                     } else if (m == NaN) {
                         tmp.getPoints().addAll(x1, y1 + j * x_sign);
-                        Circle dots = new Circle();
-                        dots.setCenterX(x1);
-                        dots.setCenterY(y1 + j * x_sign);
-                        dots.setRadius(0.5);
-                        dots.setFill(Color.AQUA);
-                        canvas.getChildren().add(dots);
                     } else {
                         tmp.getPoints().addAll(j * x_sign + x1, m * (j * x_sign + x1) + c);
-                        Circle dots = new Circle();
-                        dots.setCenterX(j * x_sign + x1);
-                        dots.setCenterY(m * (j * x_sign + x1) + c);
-                        dots.setRadius(0.5);
-                        dots.setFill(Color.AQUA);
-                        canvas.getChildren().add(dots);
                     }
                 }
                 // Y-Dimension Resolution
-                for (int j = 0; j < abs(y_len); j+=2) {
+                // Not added, it will require a much more complex solution
+                // which is not needed
+                /*
+                for (int j = 0; j < abs(y_len); j += 5) {
                     if (1 / m == 0) {
                         tmp.getPoints().addAll(x1, y1 + j * y_sign);
                         Circle dots = new Circle();
@@ -379,10 +361,10 @@ public final class MapController {
                         dots.setFill(Color.AQUA);
                         canvas.getChildren().add(dots);
                     }
-                }
+                }*/
             }
+            polygon.getPoints().removeAll(polygon.getPoints());
             polygon.getPoints().setAll(tmp.getPoints());
-            polygon = tmp;
         }
     }
 }
