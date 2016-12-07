@@ -52,7 +52,7 @@ public final class MapController {
         delX = 0;
         delY = 0;
         JSONReader reader
-                = new JSONReader(new File("resources/afrikaburnmap.json"));
+                = new JSONReader(new File("resources/afrikaburnmapv2.json"));
         polygons = reader.polygons();
         totalPolygons = reader.getTotalPolygons();
 
@@ -78,7 +78,7 @@ public final class MapController {
         }
 
         // The origin is in the top left hand corner, changes it to bottom left
-        canvas.getTransforms().add(new Rotate(-90, GV.MAP_WIDTH / 2,
+        canvas.getTransforms().add(new Rotate(0, GV.MAP_WIDTH / 2,
                 GV.MAP_HEIGHT / 2));
     }
 
@@ -226,6 +226,12 @@ public final class MapController {
     /**
      * Find the line closest to the mouse.
      *
+     * @Author: FN Lombard
+     * @Company: VASTech
+     * @Description: This method draws a polygon with the correct face-length
+     * and area closest to the cursor when clicked.
+     *
+     * @param faceLength
      * @param plane
      * @param area
      * @param mouseX
@@ -248,16 +254,23 @@ public final class MapController {
         }
 
         infoLabel.setText(infoLabel.getText() + " " + "Line length: "
-                + Math.round(closest.getLength() * GV.METER_2_MAP_RATIO * 100)
-                / 100.0 + " m");
+                + faceLength + " m");
 
         // Find the closest point to the mouse pointer
         double m1 = gradient(closest);
         double m2 = -1 / m1;
+        double sign_m1 = m1 / abs(m1);
+        double sign_m2 = m2 / abs(m2);
+        double cc = closest.getCent()[1] - m1 * closest.getCent()[0];
+        double cm = mouseY - m2 * mouseX;
 
         //<-- Better code for looking for absolute closest line -->
         // Case exception for a horizontal line
-        double xi, yi;
+        double xi;  // X-Coord on polygon orthogonal to cursor
+        double yi;  // Y-Coord on polygon orthogonal to cursor
+        double dely = 0;
+        double extrudeLength = faceLength / 2.0;
+
         if (m2 == 0) {
             xi = closest.getCent()[0];
             yi = mouseY;
@@ -265,31 +278,90 @@ public final class MapController {
             xi = mouseX;
             yi = closest.getCent()[1];
         } else {
-            double cc = closest.getCent()[1] - m1 * closest.getCent()[0];
-            double cm = mouseY - m2 * mouseX;
             xi = (cm - cc) / (m1 - m2);
             yi = m1 * xi + cc;
         }
 
+        double next_x = 0;
+        double next_y = 0;
+        Polygon book = new Polygon();
+
+        // Normalise the length
+        next_x = xi + extrudeLength / GV.METER_2_MAP_RATIO * cos(atan(m1));
+        next_y = yi + extrudeLength / GV.METER_2_MAP_RATIO * sin(atan(m1));
+
+        Circle outline1 = new Circle();
+        outline1.setCenterX(next_x);
+        outline1.setCenterY(next_y);
+        outline1.setRadius(0.4);
+        outline1.setFill(Color.BLUEVIOLET);
+
+        // Normalise the length
+        next_x += area / extrudeLength / 2 / GV.METER_2_MAP_RATIO * cos(atan(m2));
+        next_y += area / extrudeLength / 2 / GV.METER_2_MAP_RATIO * sin(atan(m2));
+        if (!plane.contains(next_x, next_y)) {
+            next_x -= 2 * area / extrudeLength / 2 / GV.METER_2_MAP_RATIO * cos(atan(m2));
+            next_y -= 2 * area / extrudeLength / 2 / GV.METER_2_MAP_RATIO * sin(atan(m2));
+        }
+
+        Circle outline2 = new Circle();
+        outline2.setCenterX(next_x);
+        outline2.setCenterY(next_y);
+        outline2.setRadius(0.4);
+        outline2.setFill(Color.BLUEVIOLET);
+
+        // Normalise the length
+        next_x -= faceLength / GV.METER_2_MAP_RATIO * cos(atan(m1));
+        next_y -= faceLength / GV.METER_2_MAP_RATIO * sin(atan(m1));
+        if (!plane.contains(next_x, next_y)) {
+            next_x += 2 * faceLength / GV.METER_2_MAP_RATIO * cos(atan(m1));
+            next_y += 2 * faceLength / GV.METER_2_MAP_RATIO * sin(atan(m1));
+        }
+
+        Circle outline3 = new Circle();
+        outline3.setCenterX(next_x);
+        outline3.setCenterY(next_y);
+        outline3.setRadius(0.4);
+        outline3.setFill(Color.BLUEVIOLET);
+
+        // Normalise the length
+        next_x += sign_m1 * area / extrudeLength / 2 / GV.METER_2_MAP_RATIO * cos(atan(m2));
+        next_y += sign_m1 * area / extrudeLength / 2 / GV.METER_2_MAP_RATIO * sin(atan(m2));
+        System.out.println((next_y - yi) / (next_x - xi) + " " + m1);
+        if (round((next_y - yi) / (next_x - xi) * 100) != round(m1 * 100)) {
+            next_x -= sign_m1 * area / extrudeLength / GV.METER_2_MAP_RATIO * cos(atan(m2));
+            next_y -= sign_m1 * area / extrudeLength / GV.METER_2_MAP_RATIO * sin(atan(m2));
+            System.out.println((next_y - yi) / (next_x - xi) + " " + m1);
+        }
+
+        Circle outline4 = new Circle();
+        outline4.setCenterX(next_x);
+        outline4.setCenterY(next_y);
+        outline4.setRadius(0.4);
+        outline4.setFill(Color.BLUEVIOLET);
+
         Circle dot = new Circle();
         dot.setCenterX(xi);
         dot.setCenterY(yi);
-        dot.setRadius(0.8);
+        dot.setRadius(0.45);
         dot.setFill(Color.GREEN);
 
         // <-- INSERT CODE FOR DRAWING POLYGON -->
         // <-- INSERT CODE FOR POLYGON LISTENERS -->
-        Line draw = new Line(closest.getX1(),
+        /*Line draw = new Line(closest.getX1(),
                 closest.getY1(),
                 closest.getX2(),
                 closest.getY2());
         draw.setStroke(Color.RED);
-        draw.setStrokeWidth(0.5);
-
+        draw.setStrokeWidth(0.15);*/
         // Add all drawn components
-        draw.getTransforms().addAll(new Translate(delX, delY));
+        // draw.getTransforms().addAll(new Translate(delX, delY));
         dot.getTransforms().addAll(new Translate(delX, delY));
-        canvas.getChildren().addAll(draw, dot);
+        outline1.getTransforms().addAll(new Translate(delX, delY));
+        outline2.getTransforms().addAll(new Translate(delX, delY));
+        outline3.getTransforms().addAll(new Translate(delX, delY));
+        outline4.getTransforms().addAll(new Translate(delX, delY));
+        canvas.getChildren().addAll(dot, outline1, outline2, outline3, outline4);
     }
 
     private double gradient(GeoLine line) {
@@ -299,7 +371,11 @@ public final class MapController {
     }
 
     /**
-     * Add resolution
+     *
+     * @Author: FN Lombard
+     * @Company: VASTech
+     * @Description: This method increases the resolution of the polygons in
+     * order to increase the accuracy of the bookedArea method.
      */
     public void increaseResolution() {
         for (Polygon polygon : polygons) {
@@ -312,14 +388,13 @@ public final class MapController {
                 y1 = polygon.getPoints().get(i + 1 + tracker);
                 x2 = polygon.getPoints().get(i + 2 + tracker);
                 y2 = polygon.getPoints().get(i + 3 + tracker);
-                // Add one point for each meter on the line - exlude first and last points.
+
                 x_len = x2 - x1;
                 y_len = y2 - y1;
 
                 double m = y_len / x_len;
                 double c = y2 - m * x2;
                 int x_sign = (int) (x_len / abs(x_len));
-                int y_sign = (int) (y_len / abs(y_len));
 
                 // X-Dimension Resolution
                 for (int j = 0; j < abs(x_len); j += 2) {
@@ -331,37 +406,6 @@ public final class MapController {
                         tmp.getPoints().addAll(j * x_sign + x1, m * (j * x_sign + x1) + c);
                     }
                 }
-                // Y-Dimension Resolution
-                // Not added, it will require a much more complex solution
-                // which is not needed
-                /*
-                for (int j = 0; j < abs(y_len); j += 5) {
-                    if (1 / m == 0) {
-                        tmp.getPoints().addAll(x1, y1 + j * y_sign);
-                        Circle dots = new Circle();
-                        dots.setCenterX(x1);
-                        dots.setCenterY(y1 + j * y_sign);
-                        dots.setRadius(0.5);
-                        dots.setFill(Color.AQUA);
-                        canvas.getChildren().add(dots);
-                    } else if (1 / m == NaN) {
-                        tmp.getPoints().addAll(j * y_sign + x1, y1);
-                        Circle dots = new Circle();
-                        dots.setCenterX(j * y_sign + x1);
-                        dots.setCenterY(y1);
-                        dots.setRadius(0.5);
-                        dots.setFill(Color.AQUA);
-                        canvas.getChildren().add(dots);
-                    } else {
-                        tmp.getPoints().addAll(1 / m * (j * y_sign + y1 - c), j * y_sign + y1);
-                        Circle dots = new Circle();
-                        dots.setCenterX(1 / m * (j * y_sign + y1 - c));
-                        dots.setCenterY(j * y_sign + y1);
-                        dots.setRadius(0.5);
-                        dots.setFill(Color.AQUA);
-                        canvas.getChildren().add(dots);
-                    }
-                }*/
             }
             polygon.getPoints().removeAll(polygon.getPoints());
             polygon.getPoints().setAll(tmp.getPoints());

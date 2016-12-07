@@ -19,9 +19,9 @@
 
 <BorderPane fx:id="borderPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="900.0" style="-fx-background-color: white;" stylesheets="@Resources/Cobra.css" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1" fx:controller="afrikaburn.Controller">
    <bottom>
-      <HBox fx:id="labelBox" minHeight="-Infinity" prefHeight="29.0" prefWidth="900.0" BorderPane.alignment="CENTER">
+      <HBox fx:id="labelBox" minHeight="-Infinity" minWidth="-Infinity" prefHeight="29.0" style="-fx-background-color: #383838;" BorderPane.alignment="CENTER">
          <children>
-            <Label fx:id="infoLabel" prefHeight="29.0" prefWidth="916.0" style="-fx-text-fill: white; -fx-background-color: #383838;" text="Label">
+            <Label fx:id="infoLabel" prefHeight="29.0" style="-fx-text-fill: white;" text="Label">
                <padding>
                   <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
                </padding></Label>
@@ -34,9 +34,10 @@
             <Button maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" text="Map Layout" />
             <Button layoutX="10.0" layoutY="10.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" text="Manage Maps" />
             <Button layoutX="10.0" layoutY="35.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" text="Manage Bookings" />
-            <ScrollPane prefHeight="452.0" prefWidth="173.0" style="-fx-background-color: #383838;">
+            <Button layoutX="10.0" layoutY="60.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#exportMap" text="Export Map" />
+            <ScrollPane fitToHeight="true" fitToWidth="true" style="-fx-background-color: #383838;" VBox.vgrow="ALWAYS">
                <content>
-                  <VBox fx:id="clientList" prefHeight="450.0" prefWidth="171.0" style="-fx-background-color: #383838;" />
+                  <VBox fx:id="clientList" maxHeight="1.7976931348623157E308" style="-fx-background-color: #383838;" />
                </content>
             </ScrollPane>
             <Button layoutX="10.0" layoutY="60.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#btnExit" prefWidth="173.0" text="Exit" />

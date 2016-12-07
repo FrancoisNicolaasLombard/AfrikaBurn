@@ -1,12 +1,17 @@
 package afrikaburn;
 
+import java.io.File;
+import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
+import javafx.embed.swing.SwingFXUtils;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.SnapshotParameters;
 import javafx.scene.control.Label;
+import javafx.scene.image.WritableImage;
 import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.Dragboard;
 import javafx.scene.input.MouseEvent;
@@ -20,6 +25,7 @@ import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
+import javax.imageio.ImageIO;
 
 /**
  *
@@ -145,6 +151,7 @@ public class Controller implements Initializable {
         // Stops the map from clipping over the other components
         borderPane.setCenter(map);
         map.toBack();
+
     }
 
     /**
@@ -179,13 +186,34 @@ public class Controller implements Initializable {
 
         window.setTitle("Afrika Burn Map");
         window.setScene(content);
-        window.setResizable(false);
         window.show();
+    }
+
+    /**
+     * FIX - DRAW NEW TMP MAP WITH POLYGONS, WHEN TRANSLATING - INCREASING RES.
+     */
+    @FXML
+    public void exportMap() {
+        map.setScaleX(20);
+        map.setScaleY(20);
+        WritableImage image = map.snapshot(new SnapshotParameters(), null);
+        map.setScaleX(1);
+        map.setScaleY(1);
+
+        // TODO: probably use a file chooser here
+        File file = new File("Map.png");
+
+        try {
+            ImageIO.write(SwingFXUtils.fromFXImage(image, null), "png", file);
+        } catch (IOException e) {
+            // TODO: handle exception here
+        }
     }
 
     /**
      * @Description: Close command for the exit button.
      */
+    @FXML
     public void btnExit() {
         window.close();
     }

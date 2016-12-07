@@ -14,6 +14,6 @@ public class GV {
     public static final int MAP_HEIGHT = 550;
     public static final int MAP_WIDTH = 550;
     public static final double ZOOM_AMOUNT = 1.15;
-    public static final double METER_SQUARED_2_MAP_RATIO = 7.198633233;
+    public static final double METER_SQUARED_2_MAP_RATIO = 1;
     public static final double METER_2_MAP_RATIO = Math.sqrt(METER_SQUARED_2_MAP_RATIO);
 }
