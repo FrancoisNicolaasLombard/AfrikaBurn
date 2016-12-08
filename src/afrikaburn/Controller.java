@@ -113,7 +113,6 @@ public class Controller implements Initializable {
         } else {
             mapBuild.zoomOut();
         }
-
     }
 
     /**

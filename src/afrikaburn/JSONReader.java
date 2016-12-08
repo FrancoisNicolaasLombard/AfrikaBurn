@@ -3,14 +3,6 @@ package afrikaburn;
 import javafx.scene.shape.Polygon;
 import java.io.File;
 import java.io.FileNotFoundException;
-import static java.lang.Double.NaN;
-import static java.lang.Math.cos;
-import static java.lang.Math.log;
-import static java.lang.Math.pow;
-import static java.lang.Math.sin;
-import static java.lang.Math.sqrt;
-import static java.lang.Math.tan;
-import static java.lang.Math.toRadians;
 import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -67,24 +59,12 @@ public class JSONReader {
                         This method of mapping does not work.. rather using
                         the 1:1 approximation when dealing with small areas 
                         that x = longitude and y = latitude
-                         
-                        x = (longitude+180)*(mapWidth/360)
-
-                        // convert from degrees to radians
-                        latRad = latitude*PI/180;
-
-                        // get y value
-                        mercN = log(tan((PI/4)+(latRad/2)));
-                        y     = (mapHeight/2)-(mapWidth*mercN/(2*PI));
-                         */
+                        */
+                        
                         double lat = Double.parseDouble(token);
                         token = input.next().replace(",", "");
                         double lon = Double.parseDouble(token);
-                        double x = (lon + 180)*200/360;
-                        double mercN = log(tan((Math.PI/4) + (toRadians(lat)/2)));
-                        
-                        double y = (100/2) - (200*mercN/(Math.PI*2));
-                        polygons[currentPolygon].getPoints().addAll(-y, -x);
+                        polygons[currentPolygon].getPoints().addAll(lat, -lon);
                     }
                 }
             }
@@ -112,7 +92,6 @@ public class JSONReader {
             Logger.getLogger(JSONReader.class.getName())
                     .log(Level.SEVERE, null, ex);
         }
-        System.out.println(entries);
         totalPolygons = entries;
     }
 
