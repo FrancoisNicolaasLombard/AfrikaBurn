@@ -7,19 +7,15 @@ import static java.lang.Math.atan;
 import static java.lang.Math.cos;
 import static java.lang.Math.pow;
 import static java.lang.Math.round;
-import static java.lang.Math.signum;
 import static java.lang.Math.sin;
 import static java.lang.Math.sqrt;
 import javafx.collections.ObservableList;
-import javafx.event.EventHandler;
 import javafx.scene.control.Label;
 import javafx.scene.input.DragEvent;
 import javafx.scene.input.Dragboard;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.input.TransferMode;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
-import javafx.scene.shape.Circle;
 import javafx.scene.shape.Polygon;
 import javafx.scene.transform.Rotate;
 import javafx.scene.transform.Translate;
@@ -32,15 +28,16 @@ import javafx.scene.transform.Translate;
 public final class MapController {
 
     // Class variables
-    final Polygon[] highRes;
-    final Polygon[] lowRes;
-    //final Polygon[] clients;
-    private double yMin;
-    private double yMax;
-    private double xMin;
-    private double xMax;
-    private double delX;
-    private double delY;
+    private final Polygon[] highRes;// High Resolution Polygons
+    private final Polygon[] lowRes; // Low Resolution Polygons
+    private final Polygon[] clientPolygons;
+    private final Booking[] clients;// All of the Clients
+    private double yMin;    // Smallest Y-Value of map
+    private double yMax;    // Largest Y-Value of map
+    private double xMin;    // Smallest X-Value of map
+    private double xMax;    // Largest X-Value of map
+    private double delX;    // Total dragged X
+    private double delY;    // Total dragged Y
     private final int totalPolygons;
     private final Label infoLabel;
     private final Pane canvas;
@@ -50,7 +47,9 @@ public final class MapController {
      * @Description: Reads the map from the file (name must be
      * afrikaburnmap.json) and loads the coordinates.
      */
-    MapController(Label infoLabel, Pane map) {
+    MapController(Label infoLabel, Pane map, Booking[] clients, Polygon[] clientPolygons) {
+        this.clientPolygons = clientPolygons;
+        this.clients = clients;
         this.infoLabel = infoLabel;
         this.canvas = map;
         delX = 0;
@@ -60,12 +59,12 @@ public final class MapController {
         highRes = reader.polygons();
         lowRes = reader.polygons();
         totalPolygons = reader.getTotalPolygons();
-        //clients = new Polygons();
+
         minMax();
         portMap();
 
-        //increaseResolution();
-        getMap();
+        setupMap();
+        // Read saved bookings
     }
 
     /**
@@ -73,12 +72,21 @@ public final class MapController {
      * @Company: VASTech
      * @Description: This method builds the map and returns it to the controller
      */
-    public void getMap() {
+    public void setupMap() {
         for (Polygon current : highRes) {
             current.setFill(Color.LIGHTGREY);
             current.setStroke(Color.BLACK);
             current.setStrokeWidth(0.25);
-            setListeners(current);
+            setMapListeners(current);
+            canvas.getChildren().add(current);
+        }
+
+        for (Polygon current : clientPolygons) {
+            current.setStroke(Color.BLACK);
+            current.setStrokeWidth(0.25);
+            current.setFill(Color.DODGERBLUE);
+
+            setClientListeners(current);
             canvas.getChildren().add(current);
         }
 
@@ -92,11 +100,28 @@ public final class MapController {
      *
      * @param current
      */
-    private void setListeners(Polygon current) {
+    private void setMapListeners(Polygon current) {
         current.setOnMouseClicked(e -> {
+
             infoLabel.setText("Total Area: " + round(area(current) * 100)
                     / 100.0 + " m\u00B2");
-            bookedArea(current, 10, 100, e.getX(), e.getY());
+
+            //bookedArea(current, 10, 100, e.getX(), e.getY());
+        });
+
+        current.setOnMousePressed(e -> {
+            editing = true;
+            for (Polygon booking : clientPolygons) {
+                if (booking.contains(e.getX(), e.getY())) {
+                    System.out.println("WORKING");
+                }
+            }
+        });
+        current.setOnMouseDragged(e -> {
+            // moveBooking(current, booking, faceLength, area, e.getX(), e.getY());
+        });
+        current.setOnMouseReleased(e -> {
+            editing = false;
         });
 
         current.setOnDragDropped(e -> {
@@ -113,17 +138,46 @@ public final class MapController {
         });
 
         current.setOnDragOver((DragEvent e) -> {
-            if (e.getGestureSource() != current
-                    && e.getDragboard().hasString()) {
+            if (e.getDragboard().hasString()) {
+
                 e.acceptTransferModes(TransferMode.COPY);
-                current.setFill(Color.BLUE);
+
+                Polygon booking = clients[Integer.parseInt(e.getDragboard().getString().split(",")[0])].getArea();
+                booking.getPoints().removeAll(booking.getPoints());
+
+                moveBooking(current,
+                        booking,
+                        Double.parseDouble(e.getDragboard().getString().split(",")[2]),
+                        Double.parseDouble(e.getDragboard().getString().split(",")[3]),
+                        e.getX(),
+                        e.getY());
             }
-            System.out.println("TEST");
             e.consume();
         });
 
         current.setOnDragExited(e -> {
             current.setFill(Color.LIGHTGREY);
+        });
+    }
+
+    private void setClientListeners(Polygon current) {
+        current.setOnDragOver((DragEvent e) -> {
+            if (e.getDragboard().hasString()) {
+
+                e.acceptTransferModes(TransferMode.COPY);
+
+                for (Polygon plane : highRes) {
+                    if (plane.contains(getCenter(current)[0], getCenter(current)[1])) {
+                        moveBooking(plane,
+                                current,
+                                Double.parseDouble(e.getDragboard().getString().split(",")[2]),
+                                Double.parseDouble(e.getDragboard().getString().split(",")[3]),
+                                e.getX(),
+                                e.getY());
+                    }
+                }
+            }
+            e.consume();
         });
     }
 
@@ -231,201 +285,6 @@ public final class MapController {
         return abs(area);
     }
 
-    /**
-     * Find the line closest to the mouse.
-     *
-     * @param mouseX
-     * @Author: FN Lombard
-     * @Company: VASTech
-     * @Description: This method draws a polygon with the correct face-length
-     * and area closest to the cursor when clicked.
-     *
-     * @param faceLength
-     * @param plane
-     * @param area
-     * @param mouseY
-     */
-    public void bookedArea(Polygon plane, double faceLength, double area, double mouseX, double mouseY) {
-        // Declare two points and use the first two as default
-        GeoLine closest = new GeoLine(plane.getPoints().get(0), plane.getPoints().get(1),
-                plane.getPoints().get(2), plane.getPoints().get(3));
-        double shortest = closest.cent2Point(mouseX, mouseY);
-
-        // Find the line closest to the mouse pointer
-        for (int x = 2; x < plane.getPoints().size() - 2; x += 2) {
-            GeoLine tmp = new GeoLine(plane.getPoints().get(x), plane.getPoints().get(x + 1),
-                    plane.getPoints().get(x + 2), plane.getPoints().get(x + 3));
-            if (tmp.cent2Point(mouseX, mouseY) < shortest) {
-                closest = tmp;
-                shortest = tmp.cent2Point(mouseX, mouseY);
-            }
-        }
-
-        // Find the closest point to the mouse pointer
-        double m1 = gradient(closest);
-        double m2 = -1 / m1;
-        double c1 = closest.getCent()[1] - m1 * closest.getCent()[0];
-        double c2 = mouseY - m2 * mouseX;
-
-        double xi;
-        double yi;
-        double halfFace = faceLength / 2.0;
-
-        if (m2 == 0) {
-            xi = closest.getCent()[0];
-            yi = mouseY;
-        } else if (m1 == 0) {
-            xi = mouseX;
-            yi = closest.getCent()[1];
-        } else {
-            xi = (c2 - c1) / (m1 - m2);
-            yi = m1 * xi + c1;
-        }
-
-        // Next point on the polygon.
-        double next_x, prev_x;
-        double next_y, prev_y;
-        Polygon booking = new Polygon();
-
-        // The closest to the mouse pointer is the origin
-        prev_x = xi;
-        prev_y = yi;
-
-        booking.getPoints().addAll(xi, yi);
-
-        // Draw the next point following the polygon following the polygon line
-        next_x = prev_x + halfFace / GV.METER_2_MAP_RATIO * cos(atan(m1));
-        next_y = prev_y + halfFace / GV.METER_2_MAP_RATIO * sin(atan(m1));
-
-        booking.getPoints().addAll(next_x, next_y);
-
-        // Normalise the length
-        next_x += area / faceLength / GV.METER_2_MAP_RATIO * cos(atan(m2));
-        next_y += area / faceLength / GV.METER_2_MAP_RATIO * sin(atan(m2));
-        if (!plane.contains(next_x, next_y)) {
-            next_x -= 2 * area / faceLength / GV.METER_2_MAP_RATIO * cos(atan(m2));
-            next_y -= 2 * area / faceLength / GV.METER_2_MAP_RATIO * sin(atan(m2));
-        }
-
-        booking.getPoints().addAll(next_x, next_y);
-
-        // Normalise the length
-        next_x -= faceLength / GV.METER_2_MAP_RATIO * cos(atan(m1));
-        next_y -= faceLength / GV.METER_2_MAP_RATIO * sin(atan(m1));
-        if (!plane.contains(next_x, next_y)) {
-            next_x += 2 * faceLength / GV.METER_2_MAP_RATIO * cos(atan(m1));
-            next_y += 2 * faceLength / GV.METER_2_MAP_RATIO * sin(atan(m1));
-        }
-
-        booking.getPoints().addAll(next_x, next_y);
-
-        // Normalise the length
-        next_x += area / faceLength / GV.METER_2_MAP_RATIO * cos(atan(m2));
-        next_y += area / faceLength / GV.METER_2_MAP_RATIO * sin(atan(m2));
-        if (round((next_y - yi) / (next_x - xi) * 100) != round(m1 * 100)) {
-            next_x -= 2 * area / faceLength / GV.METER_2_MAP_RATIO * cos(atan(m2));
-            next_y -= 2 * area / faceLength / GV.METER_2_MAP_RATIO * sin(atan(m2));
-        }
-
-        booking.getPoints().addAll(next_x, next_y);
-
-        //dot.getTransforms().addAll(new Translate(delX, delY));
-        booking.setStroke(Color.BLACK);
-        booking.setStrokeWidth(0.25);
-        booking.setFill(Color.DODGERBLUE);
-        booking.getTransforms().addAll(new Translate(delX, delY));
-        booking.setOnMousePressed(e -> {
-            editing = true;
-        });
-        booking.setOnMouseDragged(e -> {
-            double mouseX_new = e.getX();
-            double mouseY_new = e.getY();
-            booking.getPoints().removeAll(booking.getPoints());
-            // Declare two points and use the first two as default
-            GeoLine closest_new = new GeoLine(plane.getPoints().get(0), plane.getPoints().get(1),
-                    plane.getPoints().get(2), plane.getPoints().get(3));
-            double shortest_new = closest_new.cent2Point(mouseX_new, mouseY_new);
-
-            // Find the line closest to the mouse pointer
-            for (int x = 2; x < plane.getPoints().size() - 2; x += 2) {
-                GeoLine tmp = new GeoLine(plane.getPoints().get(x), plane.getPoints().get(x + 1),
-                        plane.getPoints().get(x + 2), plane.getPoints().get(x + 3));
-                if (tmp.cent2Point(mouseX_new, mouseY_new) < shortest_new) {
-                    closest_new = tmp;
-                    shortest_new = tmp.cent2Point(mouseX_new, mouseY_new);
-                }
-            }
-
-            // Find the closest point to the mouse pointer
-            double m1_new = gradient(closest_new);
-            double m2_new = -1 / m1_new;
-            double c1_new = closest_new.getCent()[1] - m1_new * closest_new.getCent()[0];
-            double c2_new = mouseY_new - m2_new * mouseX_new;
-
-            double xi_new;
-            double yi_new;
-
-            if (m2_new == 0) {
-                xi_new = closest_new.getCent()[0];
-                yi_new = mouseY_new;
-            } else if (m1_new == 0) {
-                xi_new = mouseX_new;
-                yi_new = closest_new.getCent()[1];
-            } else {
-                xi_new = (c2_new - c1_new) / (m1_new - m2_new);
-                yi_new = m1_new * xi_new + c1_new;
-            }
-
-            // The closest to the mouse pointer is the origin
-            double prev_x_new = xi_new;
-            double prev_y_new = yi_new; // Next point on the polygon.
-            double next_x_new;
-            double next_y_new;
-
-            booking.getPoints().addAll(xi_new, yi_new);
-
-            // Draw the next point following the polygon following the polygon line
-            next_x_new = prev_x_new + halfFace / GV.METER_2_MAP_RATIO * cos(atan(m1_new));
-            next_y_new = prev_y_new + halfFace / GV.METER_2_MAP_RATIO * sin(atan(m1_new));
-
-            booking.getPoints().addAll(next_x_new, next_y_new);
-
-            // Normalise the length
-            next_x_new += area / faceLength / GV.METER_2_MAP_RATIO * cos(atan(m2_new));
-            next_y_new += area / faceLength / GV.METER_2_MAP_RATIO * sin(atan(m2_new));
-            if (!plane.contains(next_x_new, next_y_new)) {
-                next_x_new -= 2 * area / faceLength / GV.METER_2_MAP_RATIO * cos(atan(m2_new));
-                next_y_new -= 2 * area / faceLength / GV.METER_2_MAP_RATIO * sin(atan(m2_new));
-            }
-
-            booking.getPoints().addAll(next_x_new, next_y_new);
-
-            // Normalise the length
-            next_x_new -= faceLength / GV.METER_2_MAP_RATIO * cos(atan(m1_new));
-            next_y_new -= faceLength / GV.METER_2_MAP_RATIO * sin(atan(m1_new));
-            if (!plane.contains(next_x_new, next_y_new)) {
-                next_x_new += 2 * faceLength / GV.METER_2_MAP_RATIO * cos(atan(m1_new));
-                next_y_new += 2 * faceLength / GV.METER_2_MAP_RATIO * sin(atan(m1_new));
-            }
-
-            booking.getPoints().addAll(next_x_new, next_y_new);
-
-            // Normalise the length
-            next_x_new += area / faceLength / GV.METER_2_MAP_RATIO * cos(atan(m2_new));
-            next_y_new += area / faceLength / GV.METER_2_MAP_RATIO * sin(atan(m2_new));
-            if (round((next_y_new - yi_new) / (next_x_new - xi_new) * 100) != round(m1_new * 100)) {
-                next_x_new -= 2 * area / faceLength / GV.METER_2_MAP_RATIO * cos(atan(m2_new));
-                next_y_new -= 2 * area / faceLength / GV.METER_2_MAP_RATIO * sin(atan(m2_new));
-            }
-
-            booking.getPoints().addAll(next_x_new, next_y_new);
-        });
-        booking.setOnMouseReleased(e -> {
-            editing = false;
-        });
-        canvas.getChildren().add(booking);
-    }
-
     private double gradient(GeoLine line) {
         double dy = line.getY2() - line.getY1();
         double dx = line.getX2() - line.getX1();
@@ -482,5 +341,111 @@ public final class MapController {
         double dy = y2 - y1;
         double dx = x2 - x1;
         return round(dy / dx * 100) / 100.0;
+    }
+
+    private void moveBooking(Polygon plane, Polygon booking, double faceLength, double area, double mouseX, double mouseY) {
+        // Declare two points and use the first two as default
+        GeoLine closest = new GeoLine(plane.getPoints().get(0), plane.getPoints().get(1),
+                plane.getPoints().get(2), plane.getPoints().get(3));
+        double shortest = closest.cent2Point(mouseX, mouseY);
+
+        // Find the line closest to the mouse pointer
+        for (int x = 2; x < plane.getPoints().size() - 2; x += 2) {
+            GeoLine tmp = new GeoLine(plane.getPoints().get(x), plane.getPoints().get(x + 1),
+                    plane.getPoints().get(x + 2), plane.getPoints().get(x + 3));
+            if (tmp.cent2Point(mouseX, mouseY) < shortest) {
+                closest = tmp;
+                shortest = tmp.cent2Point(mouseX, mouseY);
+            }
+        }
+
+        // Find the closest point to the mouse pointer
+        double m1 = gradient(closest);
+        double m2 = -1 / m1;
+        double c1 = closest.getCent()[1] - m1 * closest.getCent()[0];
+        double c2 = mouseY - m2 * mouseX;
+
+        double xi;
+        double yi;
+
+        if (m2 == 0) {
+            xi = closest.getCent()[0];
+            yi = mouseY;
+        } else if (m1 == 0) {
+            xi = mouseX;
+            yi = closest.getCent()[1];
+        } else {
+            xi = (c2 - c1) / (m1 - m2);
+            yi = m1 * xi + c1;
+        }
+
+        // The closest to the mouse pointer is the origin
+        double prev_x = xi;
+        double prev_y = yi; // Next point on the polygon.
+        double next_x;
+        double next_y;
+
+        ObservableList<Double> oldPoints = booking.getPoints();
+        booking.getPoints().removeAll(oldPoints);
+
+        booking.getPoints().addAll(xi, yi);
+        // Draw the next point following the polygon following the polygon line
+
+        next_x = prev_x + faceLength / 2.0 / GV.METER_2_MAP_RATIO * cos(atan(m1));
+        next_y = prev_y + faceLength / 2.0 / GV.METER_2_MAP_RATIO * sin(atan(m1));
+
+        booking.getPoints().addAll(next_x, next_y);
+
+        // Normalise the length
+        next_x += area / faceLength / GV.METER_2_MAP_RATIO * cos(atan(m2));
+        next_y += area / faceLength / GV.METER_2_MAP_RATIO * sin(atan(m2));
+        if (!plane.contains(next_x, next_y)) {
+            next_x -= 2 * area / faceLength / GV.METER_2_MAP_RATIO * cos(atan(m2));
+            next_y -= 2 * area / faceLength / GV.METER_2_MAP_RATIO * sin(atan(m2));
+        }
+
+        booking.getPoints().addAll(next_x, next_y);
+
+        // Normalise the length
+        next_x -= faceLength / GV.METER_2_MAP_RATIO * cos(atan(m1));
+        next_y -= faceLength / GV.METER_2_MAP_RATIO * sin(atan(m1));
+        if (!plane.contains(next_x, next_y)) {
+            next_x += 2 * faceLength / GV.METER_2_MAP_RATIO * cos(atan(m1));
+            next_y += 2 * faceLength / GV.METER_2_MAP_RATIO * sin(atan(m1));
+        }
+
+        booking.getPoints().addAll(next_x, next_y);
+
+        // Normalise the length
+        next_x += area / faceLength / GV.METER_2_MAP_RATIO * cos(atan(m2));
+        next_y += area / faceLength / GV.METER_2_MAP_RATIO * sin(atan(m2));
+        if (round((next_y - yi) / (next_x - xi) * 100) != round(m1 * 100)) {
+            next_x -= 2 * area / faceLength / GV.METER_2_MAP_RATIO * cos(atan(m2));
+            next_y -= 2 * area / faceLength / GV.METER_2_MAP_RATIO * sin(atan(m2));
+        }
+        booking.getPoints().addAll(next_x, next_y, xi, yi);
+        
+    }
+
+    public void removeTrans() {
+        canvas.getChildren().forEach(e -> {
+            e.getTransforms().removeAll(e.getTransforms());
+        });
+        delX = 0;
+        delY = 0;
+    }
+
+    private double[] getCenter(Polygon pol) {
+        double[] center = new double[2];
+        center[0] = 0;
+        center[1] = 0;
+        int points = 0;
+        for (int i = 0; i < pol.getPoints().size(); i += 2) {
+            center[0] += pol.getPoints().get(points++);
+            center[1] += pol.getPoints().get(points++);
+        }
+        center[0] /= points / 2.0;
+        center[1] /= points / 2.0;
+        return center;
     }
 }

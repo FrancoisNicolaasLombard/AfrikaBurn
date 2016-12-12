@@ -25,7 +25,7 @@ public class CSVReader {
                 int count = 0;
                 while (input.hasNextLine()) {
                     String[] elements = input.nextLine().split(",");
-                    client[count++] = new Booking(elements[0],
+                    client[count++] = new Booking(count - 1, elements[0],
                             Double.parseDouble(elements[1]),
                             Double.parseDouble(elements[2]),
                             elements[3].equalsIgnoreCase("yes"),
@@ -52,7 +52,7 @@ public class CSVReader {
         return nrClients;
     }
 
-    public String[] getNames() {
+    private String[] getNames() {
         String[] names = new String[client.length];
         for (int x = 0; x < client.length; x++) {
             names[x] = client[x].getName();
@@ -63,8 +63,8 @@ public class CSVReader {
     public Booking[] getClients() {
         return client;
     }
-
-    public int getNrClients() {
+    
+    public int getNrClients(){
         return nrClients;
     }
 }

@@ -13,6 +13,7 @@
 <?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Pane?>
 <?import javafx.scene.layout.VBox?>
 
 <!-- Only one controller -->
@@ -31,16 +32,16 @@
    <left>
       <VBox fx:id="menuBar" prefHeight="574.0" prefWidth="173.0" style="-fx-background-color: #383838;" BorderPane.alignment="CENTER">
          <children>
-            <Button maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" text="Map Layout" />
-            <Button layoutX="10.0" layoutY="10.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" text="Manage Maps" />
-            <Button layoutX="10.0" layoutY="35.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" text="Manage Bookings" />
-            <Button layoutX="10.0" layoutY="60.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#exportMap" text="Export Map" />
-            <ScrollPane fitToHeight="true" fitToWidth="true" style="-fx-background-color: #383838;" VBox.vgrow="ALWAYS">
+            <Button fx:id="btnMapLayout" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" text="Map Layout" />
+            <Button fx:id="btnManageMaps" layoutX="10.0" layoutY="10.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" text="Manage Maps" />
+            <Button fx:id="btnManageBookings" layoutX="10.0" layoutY="35.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" text="Manage Bookings" />
+            <Button fx:id="btnExportMap" layoutX="10.0" layoutY="60.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#exportMap" text="Export Map" />
+            <ScrollPane fx:id="spClientHolder" fitToHeight="true" fitToWidth="true" style="-fx-background-color: #383838;" VBox.vgrow="ALWAYS">
                <content>
                   <VBox fx:id="clientList" maxHeight="1.7976931348623157E308" style="-fx-background-color: #383838;" />
                </content>
             </ScrollPane>
-            <Button layoutX="10.0" layoutY="60.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#btnExit" prefWidth="173.0" text="Exit" />
+            <Button fx:id="btnExit" layoutX="10.0" layoutY="60.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#btnExit" prefWidth="173.0" text="Exit" />
          </children>
       </VBox>
    </left>

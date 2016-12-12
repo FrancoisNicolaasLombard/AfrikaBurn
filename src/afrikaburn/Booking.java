@@ -1,5 +1,6 @@
 package afrikaburn;
 
+import javafx.scene.paint.Color;
 import javafx.scene.shape.Polygon;
 
 /**
@@ -16,27 +17,35 @@ public class Booking {
     private boolean noiseSensitivite;
     private boolean eroticSensitive;
     private final Polygon area;
+    private final int id;
 
-    public Booking(String name,
+    public Booking(int id, String name,
             double front,
             double size,
             boolean noiseSensitivite,
             boolean eroticSensitive) {
+        this.id = id;
         this.name = name;
         this.front = front;
         this.size = size;
         this.noiseSensitivite = noiseSensitivite;
         this.eroticSensitive = eroticSensitive;
         area = new Polygon();
+        
     }
 
+    @Override
     public String toString() {
-        return name + " " + size;
+        return id + "," + name + "," + front + "," + size + "," + noiseSensitivite + "," + eroticSensitive;
     }
 
     /**
      * @Author @return @Description: Getter and Setter methods
      */
+    public int getId() {
+        return id;
+    }
+
     public String getName() {
         return name;
     }
@@ -76,12 +85,12 @@ public class Booking {
     public void setEroticSensitive(boolean eroticSensitive) {
         this.eroticSensitive = eroticSensitive;
     }
-    
-    public void setArea(Polygon saved){
+
+    public void setArea(Polygon saved) {
         area.getPoints().setAll(saved.getPoints());
     }
-    
-    public Polygon getArea(){
+
+    public Polygon getArea() {
         return area;
     }
 }

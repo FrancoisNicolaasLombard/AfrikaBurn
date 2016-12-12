@@ -1,5 +1,8 @@
 package afrikaburn;
 
+import java.awt.Dimension;
+import java.awt.Toolkit;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
@@ -10,7 +13,9 @@ import javafx.fxml.Initializable;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.SnapshotParameters;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.image.WritableImage;
 import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.Dragboard;
@@ -23,9 +28,11 @@ import javafx.scene.layout.Pane;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
+import javafx.scene.shape.Polygon;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import javax.imageio.ImageIO;
+import javax.swing.JOptionPane;
 
 /**
  *
@@ -40,28 +47,42 @@ public class Controller implements Initializable {
     // Local Variables
     private Stage window;
     private Scene content;
-    private Parent root;
-    private boolean onPolygon = false;
     private boolean dragging = false;
     private double dragX = 0;
     private double dragY = 0;
     private MapController mapBuild;
     private Pane map;
     private Booking[] clients;
+    private Polygon[] clientPolygons;
+    private Dimension screenSize;
 
     // References to FXML components
     @FXML
     BorderPane borderPane;
+
     @FXML
     HBox labelBox;
+    @FXML
+    Label infoLabel;
+
     @FXML
     VBox menuBar;
     @FXML
     Region region;
     @FXML
-    Label infoLabel;
+    Button btnMapLayout;
+    @FXML
+    Button btnManageMaps;
+    @FXML
+    Button btnManageBookings;
+    @FXML
+    Button btnExportMap;
+    @FXML
+    ScrollPane spClientHolder;
     @FXML
     VBox clientList;
+    @FXML
+    Button btnExit;
 
     /**
      *
@@ -116,6 +137,34 @@ public class Controller implements Initializable {
     }
 
     /**
+     * FIX - DRAW NEW TMP MAP WITH POLYGONS, WHEN TRANSLATING - INCREASING RES.
+     */
+    @FXML
+    public void exportMap() {
+        // Restores image resolution
+        mapBuild.removeTrans();
+        map.setScaleX(20);
+        map.setScaleY(20);
+        map.autosize();
+        try {
+            ImageIO.write(SwingFXUtils.fromFXImage(map.snapshot(new SnapshotParameters(), null), null), "png", new File("test.png"));
+        } catch (IOException e) {
+            System.out.println(e.getMessage());
+        }
+
+        map.setScaleX((screenSize.getWidth() * 0.75) / GV.MAP_WIDTH);
+        map.setScaleY((screenSize.getWidth() * 0.75) / GV.MAP_WIDTH);
+    }
+
+    /**
+     * @Description: Close command for the exit button.
+     */
+    @FXML
+    public void btnExit() {
+        window.close();
+    }
+
+    /**
      *
      * @param location
      * @param resources
@@ -124,33 +173,47 @@ public class Controller implements Initializable {
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         //<< LOAD USER DATA FROM CSV FILE>>//
-        CSVReader read = new CSVReader();
-        clients = read.getClients();
+        //Build the map
+        screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+        map = new Pane(); // Keep reference of map in this class to add bookings
+        CSVReader reader = new CSVReader();
+        clients = reader.getClients();
+        clientPolygons = new Polygon[reader.getNrClients()];
 
-        // Populate the listview with camper names
         for (Booking client : clients) {
+            // Populate the client list 
             Text tmpClient = new Text(client.getName());
             tmpClient.setFill(Color.WHITE);
             tmpClient.setOnDragDetected(e -> {
                 Dragboard db = tmpClient.startDragAndDrop(TransferMode.COPY);
-                ClipboardContent content = new ClipboardContent();
-                content.putString(tmpClient.toString());
-                db.setContent(content);
+                ClipboardContent cb = new ClipboardContent();
+                cb.putString(client.toString());
+                db.setContent(cb);
                 e.consume();
             });
             clientList.getChildren().add(tmpClient);
+
+            client.getArea().setOnDragDetected(e -> {
+                Dragboard db = tmpClient.startDragAndDrop(TransferMode.COPY);
+                ClipboardContent cb = new ClipboardContent();
+                cb.putString(client.toString());
+                db.setContent(cb);
+                e.consume();
+            });
+            clientPolygons[client.getId()] = client.getArea();
         }
 
-        //Build the map
-        map = new Pane();
-        mapBuild = new MapController(infoLabel, map);
-
+        mapBuild = new MapController(infoLabel, map, clients, clientPolygons);
         mapListeners();
 
-        // Stops the map from clipping over the other components
+        // Add map to the GUI
         borderPane.setCenter(map);
         map.toBack();
-
+        map.autosize();
+        map.resize(screenSize.getWidth() - 173, screenSize.getHeight());
+        map.setScaleX((screenSize.getWidth() * 0.75) / GV.MAP_WIDTH);
+        map.setScaleY((screenSize.getWidth() * 0.75) / GV.MAP_WIDTH);
+        mapBuild.dragMap((screenSize.getWidth() * 0.75) / 2.5, screenSize.getHeight() / 3.5);
     }
 
     /**
@@ -179,41 +242,11 @@ public class Controller implements Initializable {
      */
     public void setWindow(Stage window, Parent root) {
         this.window = window;
-        this.root = root;
 
-        content = new Scene(root, 900, 600);
+        content = new Scene(root, screenSize.getWidth(), screenSize.getHeight());
 
         window.setTitle("Afrika Burn Map");
         window.setScene(content);
         window.show();
-    }
-
-    /**
-     * FIX - DRAW NEW TMP MAP WITH POLYGONS, WHEN TRANSLATING - INCREASING RES.
-     */
-    @FXML
-    public void exportMap() {
-        map.setScaleX(20);
-        map.setScaleY(20);
-        WritableImage image = map.snapshot(new SnapshotParameters(), null);
-        map.setScaleX(1);
-        map.setScaleY(1);
-
-        // TODO: probably use a file chooser here
-        File file = new File("Map.png");
-
-        try {
-            ImageIO.write(SwingFXUtils.fromFXImage(image, null), "png", file);
-        } catch (IOException e) {
-            // TODO: handle exception here
-        }
-    }
-
-    /**
-     * @Description: Close command for the exit button.
-     */
-    @FXML
-    public void btnExit() {
-        window.close();
     }
 }
