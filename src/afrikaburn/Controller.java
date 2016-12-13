@@ -185,7 +185,7 @@ public class Controller implements Initializable {
             Text tmpClient = new Text(client.getName());
             tmpClient.setFill(Color.WHITE);
             tmpClient.setOnDragDetected(e -> {
-                Dragboard db = tmpClient.startDragAndDrop(TransferMode.COPY);
+                Dragboard db = tmpClient.startDragAndDrop(TransferMode.MOVE);
                 ClipboardContent cb = new ClipboardContent();
                 cb.putString(client.toString());
                 db.setContent(cb);
@@ -194,12 +194,14 @@ public class Controller implements Initializable {
             clientList.getChildren().add(tmpClient);
 
             client.getArea().setOnDragDetected(e -> {
-                Dragboard db = tmpClient.startDragAndDrop(TransferMode.COPY);
+                Dragboard db = tmpClient.startDragAndDrop(TransferMode.MOVE);
                 ClipboardContent cb = new ClipboardContent();
                 cb.putString(client.toString());
                 db.setContent(cb);
+                client.getArea().setOpacity(0.5);
                 e.consume();
             });
+
             clientPolygons[client.getId()] = client.getArea();
         }
 

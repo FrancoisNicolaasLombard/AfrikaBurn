@@ -16,6 +16,7 @@ import javafx.scene.input.Dragboard;
 import javafx.scene.input.TransferMode;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
+import javafx.scene.shape.Line;
 import javafx.scene.shape.Polygon;
 import javafx.scene.transform.Rotate;
 import javafx.scene.transform.Translate;
@@ -28,8 +29,7 @@ import javafx.scene.transform.Translate;
 public final class MapController {
 
     // Class variables
-    private final Polygon[] highRes;// High Resolution Polygons
-    private final Polygon[] lowRes; // Low Resolution Polygons
+    private final Polygon[] mapPolygons;// High Resolution Polygons
     private final Polygon[] clientPolygons;
     private final Booking[] clients;// All of the Clients
     private double yMin;    // Smallest Y-Value of map
@@ -42,6 +42,8 @@ public final class MapController {
     private final Label infoLabel;
     private final Pane canvas;
     private boolean editing = false;
+    private final Line one;
+    private final Line two;
 
     /**
      * @Description: Reads the map from the file (name must be
@@ -52,12 +54,13 @@ public final class MapController {
         this.clients = clients;
         this.infoLabel = infoLabel;
         this.canvas = map;
+        one = new Line();
+        two = new Line();
         delX = 0;
         delY = 0;
         JSONReader reader
                 = new JSONReader(new File("resources/afrikaburnmapv2.json"));
-        highRes = reader.polygons();
-        lowRes = reader.polygons();
+        mapPolygons = reader.polygons();
         totalPolygons = reader.getTotalPolygons();
 
         minMax();
@@ -73,10 +76,15 @@ public final class MapController {
      * @Description: This method builds the map and returns it to the controller
      */
     public void setupMap() {
-        for (Polygon current : highRes) {
+
+        one.setStrokeWidth(0.1);
+        two.setStrokeWidth(0.1);
+
+        for (Polygon current : mapPolygons) {
             current.setFill(Color.LIGHTGREY);
             current.setStroke(Color.BLACK);
-            current.setStrokeWidth(0.25);
+            current.setStrokeWidth(0.05);
+            current.setOpacity(0.8);
             setMapListeners(current);
             canvas.getChildren().add(current);
         }
@@ -85,18 +93,24 @@ public final class MapController {
             current.setStroke(Color.BLACK);
             current.setStrokeWidth(0.25);
             current.setFill(Color.DODGERBLUE);
-
+            current.setOpacity(0.5);
             setClientListeners(current);
             canvas.getChildren().add(current);
         }
 
         // The origin is in the top left hand corner, changes it to bottom left
+        canvas.getChildren().addAll(one, two);
+        canvas.setOnDragExited(e -> {
+            editing = false;
+            clients[Integer.parseInt(e.getDragboard().getString().split(",")[0])].getArea().setOpacity(1);
+            e.consume();
+        });
         canvas.getTransforms().add(new Rotate(0, GV.MAP_WIDTH / 2,
                 GV.MAP_HEIGHT / 2));
     }
 
     /**
-     * This method neatens up the code and gives the highRes its listeners
+     * This method neatens up the code and gives the mapPolygons its listeners
      *
      * @param current
      */
@@ -105,23 +119,6 @@ public final class MapController {
 
             infoLabel.setText("Total Area: " + round(area(current) * 100)
                     / 100.0 + " m\u00B2");
-
-            //bookedArea(current, 10, 100, e.getX(), e.getY());
-        });
-
-        current.setOnMousePressed(e -> {
-            editing = true;
-            for (Polygon booking : clientPolygons) {
-                if (booking.contains(e.getX(), e.getY())) {
-                    System.out.println("WORKING");
-                }
-            }
-        });
-        current.setOnMouseDragged(e -> {
-            // moveBooking(current, booking, faceLength, area, e.getX(), e.getY());
-        });
-        current.setOnMouseReleased(e -> {
-            editing = false;
         });
 
         current.setOnDragDropped(e -> {
@@ -130,7 +127,6 @@ public final class MapController {
 
             if (db.hasString()) {
                 String nodeId = db.getString();
-                System.out.println(nodeId);
                 success = true;
             }
             e.setDropCompleted(success);
@@ -140,10 +136,9 @@ public final class MapController {
         current.setOnDragOver((DragEvent e) -> {
             if (e.getDragboard().hasString()) {
 
-                e.acceptTransferModes(TransferMode.COPY);
+                e.acceptTransferModes(TransferMode.MOVE);
 
                 Polygon booking = clients[Integer.parseInt(e.getDragboard().getString().split(",")[0])].getArea();
-                booking.getPoints().removeAll(booking.getPoints());
 
                 moveBooking(current,
                         booking,
@@ -155,18 +150,15 @@ public final class MapController {
             e.consume();
         });
 
-        current.setOnDragExited(e -> {
-            current.setFill(Color.LIGHTGREY);
-        });
     }
 
     private void setClientListeners(Polygon current) {
         current.setOnDragOver((DragEvent e) -> {
-            if (e.getDragboard().hasString()) {
+            if (e.getDragboard().hasString() && clients[Integer.parseInt(e.getDragboard().getString().split(",")[0])].getArea() == current) {
 
-                e.acceptTransferModes(TransferMode.COPY);
+                e.acceptTransferModes(TransferMode.MOVE);
 
-                for (Polygon plane : highRes) {
+                for (Polygon plane : mapPolygons) {
                     if (plane.contains(getCenter(current)[0], getCenter(current)[1])) {
                         moveBooking(plane,
                                 current,
@@ -188,21 +180,21 @@ public final class MapController {
      * the polygons in order to normalize them.
      */
     private void minMax() {
-        xMin = highRes[0].getPoints().get(0);
-        yMin = highRes[0].getPoints().get(1);
+        xMin = mapPolygons[0].getPoints().get(0);
+        yMin = mapPolygons[0].getPoints().get(1);
         xMax = xMin;
         yMax = yMin;
         for (int count = 0; count < totalPolygons; count++) {
-            for (int coords = 0; coords < highRes[count].getPoints().size(); coords += 2) {
-                if (highRes[count].getPoints().get(coords + 1) > yMax) {
-                    yMax = highRes[count].getPoints().get(coords + 1);
-                } else if (highRes[count].getPoints().get(coords + 1) < yMin) {
-                    yMin = highRes[count].getPoints().get(coords + 1);
+            for (int coords = 0; coords < mapPolygons[count].getPoints().size(); coords += 2) {
+                if (mapPolygons[count].getPoints().get(coords + 1) > yMax) {
+                    yMax = mapPolygons[count].getPoints().get(coords + 1);
+                } else if (mapPolygons[count].getPoints().get(coords + 1) < yMin) {
+                    yMin = mapPolygons[count].getPoints().get(coords + 1);
                 }
-                if (highRes[count].getPoints().get(coords) > xMax) {
-                    xMax = highRes[count].getPoints().get(coords);
-                } else if (highRes[count].getPoints().get(coords) < xMin) {
-                    xMin = highRes[count].getPoints().get(coords);
+                if (mapPolygons[count].getPoints().get(coords) > xMax) {
+                    xMax = mapPolygons[count].getPoints().get(coords);
+                } else if (mapPolygons[count].getPoints().get(coords) < xMin) {
+                    xMin = mapPolygons[count].getPoints().get(coords);
                 }
             }
         }
@@ -222,9 +214,9 @@ public final class MapController {
         final double DEL_X = Math.abs(xMax - xMin);
         final double BIGGEST_EDGE = DEL_X < DEL_Y ? DEL_Y : DEL_X;
 
-        // Normalise the highRes
+        // Normalise the mapPolygons
         for (int count = 0; count < totalPolygons; count++) {
-            ObservableList<Double> tmpPolygon = highRes[count].getPoints();
+            ObservableList<Double> tmpPolygon = mapPolygons[count].getPoints();
             for (int coords = 0; coords < tmpPolygon.size(); coords += 2) {
                 tmpPolygon.set(coords, (tmpPolygon.get(coords) - xMin)
                         / BIGGEST_EDGE * GV.MAP_WIDTH);
@@ -250,7 +242,7 @@ public final class MapController {
     }
 
     /**
-     * This method zooms the canvas - not changing the size of the highRes
+     * This method zooms the canvas - not changing the size of the mapPolygons
      */
     public void zoomIn() {
         canvas.setScaleX(canvas.getScaleX() * GV.ZOOM_AMOUNT);
@@ -258,7 +250,7 @@ public final class MapController {
     }
 
     /**
-     * This method zooms the canvas - not changing the size of the highRes
+     * This method zooms the canvas - not changing the size of the mapPolygons
      */
     public void zoomOut() {
         canvas.setScaleX(canvas.getScaleX() / GV.ZOOM_AMOUNT);
@@ -291,48 +283,6 @@ public final class MapController {
         return dy / dx;
     }
 
-    /**
-     *
-     * @Author: FN Lombard
-     * @Company: VASTech
-     * @Description: This method increases the resolution of the polygons in
-     * order to increase the accuracy of the bookedArea method.
-     */
-    public void increaseResolution() {
-        for (Polygon polygon : highRes) {
-            Polygon tmp = new Polygon();
-            double x1, x2, y1, y2, x_len, y_len;
-            int originalPoints = polygon.getPoints().size(), tracker = 0;
-
-            for (int i = 0; i < originalPoints - 3; i += 2) {
-                x1 = polygon.getPoints().get(i + tracker);
-                y1 = polygon.getPoints().get(i + 1 + tracker);
-                x2 = polygon.getPoints().get(i + 2 + tracker);
-                y2 = polygon.getPoints().get(i + 3 + tracker);
-
-                x_len = x2 - x1;
-                y_len = y2 - y1;
-
-                double m = y_len / x_len;
-                double c = y2 - m * x2;
-                int x_sign = (int) (x_len / abs(x_len));
-
-                // X-Dimension Resolution
-                for (int j = 0; j < abs(x_len); j += 2) {
-                    if (m == 0) {
-                        tmp.getPoints().addAll(j * x_sign + x1, y1);
-                    } else if (m == NaN) {
-                        tmp.getPoints().addAll(x1, y1 + j * x_sign);
-                    } else {
-                        tmp.getPoints().addAll(j * x_sign + x1, m * (j * x_sign + x1) + c);
-                    }
-                }
-            }
-            polygon.getPoints().removeAll(polygon.getPoints());
-            polygon.getPoints().setAll(tmp.getPoints());
-        }
-    }
-
     private double length(double x1, double y1, double x2, double y2) {
         return sqrt(pow(x1 - x2, 2) + pow(y1 - y2, 2));
     }
@@ -345,39 +295,100 @@ public final class MapController {
 
     private void moveBooking(Polygon plane, Polygon booking, double faceLength, double area, double mouseX, double mouseY) {
         // Declare two points and use the first two as default
-        GeoLine closest = new GeoLine(plane.getPoints().get(0), plane.getPoints().get(1),
-                plane.getPoints().get(2), plane.getPoints().get(3));
-        double shortest = closest.cent2Point(mouseX, mouseY);
+        double[] line_01 = new double[4];
+        double[] line_02 = 
+        double x1, y1, x2, y2;
+        double shortest = 0;
+        double sec_shortest = shortest;
 
         // Find the line closest to the mouse pointer
         for (int x = 2; x < plane.getPoints().size() - 2; x += 2) {
-            GeoLine tmp = new GeoLine(plane.getPoints().get(x), plane.getPoints().get(x + 1),
-                    plane.getPoints().get(x + 2), plane.getPoints().get(x + 3));
-            if (tmp.cent2Point(mouseX, mouseY) < shortest) {
-                closest = tmp;
-                shortest = tmp.cent2Point(mouseX, mouseY);
+            x1 = plane.getPoints().get(x);
+            y1 = plane.getPoints().get(x + 1);
+            x2 = plane.getPoints().get(x + 2);
+            y2 = plane.getPoints().get(x + 3);
+            double temp_distance = length((x1 + x2) / 2.0, (y1 + y2) / 2.0, mouseX, mouseY);
+            
+            if (temp_distance < shortest) {
+                line_01[0] = x1;
+                line_01[1] = y1;
+                line_01[2] = x2;
+                line_01[3] = y2;
+                        
+                shortest = temp_distance;
+            } else if (temp_distance < sec_shortest) {
+                sec_closest = tmp;
+                sec_shortest = temp_distance;
             }
         }
 
         // Find the closest point to the mouse pointer
-        double m1 = gradient(closest);
-        double m2 = -1 / m1;
-        double c1 = closest.getCent()[1] - m1 * closest.getCent()[0];
-        double c2 = mouseY - m2 * mouseX;
+        double gradient_1 = gradient(closest);
+        double gradient_ort_1 = -1 / gradient_1;
+        double offset_1 = closest.getCent()[1] - gradient_1 * closest.getCent()[0];
+        double offset_ort_1 = mouseY - gradient_ort_1 * mouseX;
 
+        double gradient_2 = gradient(sec_closest);
+        double gradient_ort_2 = -1 / gradient_2;
+        double offset_2 = sec_closest.getCent()[1] - gradient_2 * sec_closest.getCent()[0];
+        double offset_ort_2 = mouseY - gradient_ort_2 * mouseX;
+
+        double xi_1;
+        double yi_1;
+        double xi_2;
+        double yi_2;
         double xi;
         double yi;
+        double gradient;
+        double gradient_ort;
 
-        if (m2 == 0) {
-            xi = closest.getCent()[0];
-            yi = mouseY;
-        } else if (m1 == 0) {
-            xi = mouseX;
-            yi = closest.getCent()[1];
+        if (gradient_ort_1 == 0) {
+            xi_1 = closest.getCent()[0];
+            yi_1 = mouseY;
+        } else if (gradient_1 == 0) {
+            xi_1 = mouseX;
+            yi_1 = closest.getCent()[1];
         } else {
-            xi = (c2 - c1) / (m1 - m2);
-            yi = m1 * xi + c1;
+            xi_1 = (offset_ort_1 - offset_1) / (gradient_1 - gradient_ort_1);
+            yi_1 = gradient_1 * xi_1 + offset_1;
         }
+
+        if (gradient_ort_2 == 0) {
+            xi_2 = sec_closest.getCent()[0];
+            yi_2 = mouseY;
+        } else if (gradient_2 == 0) {
+            xi_2 = mouseX;
+            yi_2 = sec_closest.getCent()[1];
+        } else {
+            xi_2 = (offset_ort_2 - offset_2) / (gradient_2 - gradient_ort_2);
+            yi_2 = gradient_2 * xi_2 + offset_2;
+        }
+
+        if (length(xi_1, yi_1, mouseX, mouseY) < length(xi_2, yi_2, mouseX, mouseY)) {
+            xi = xi_1;
+            yi = yi_1;
+            gradient = gradient_1;
+            gradient_ort = gradient_ort_1;
+            one.setStroke(Color.RED);
+            two.setStroke(Color.BLACK);
+        } else {
+            xi = xi_2;
+            yi = yi_2;
+            gradient = gradient_2;
+            gradient_ort = gradient_ort_2;
+            two.setStroke(Color.RED);
+            one.setStroke(Color.BLACK);
+        }
+
+        one.setStartX(mouseX);
+        one.setStartY(mouseY);
+        one.setEndX(xi_1);
+        one.setEndY(yi_1);
+
+        two.setStartX(mouseX);
+        two.setStartY(mouseY);
+        two.setEndX(xi_2);
+        two.setEndY(yi_2);
 
         // The closest to the mouse pointer is the origin
         double prev_x = xi;
@@ -386,47 +397,58 @@ public final class MapController {
         double next_y;
 
         ObservableList<Double> oldPoints = booking.getPoints();
+        Polygon test = new Polygon();
         booking.getPoints().removeAll(oldPoints);
 
-        booking.getPoints().addAll(xi, yi);
+        test.getPoints().addAll(xi, yi);
         // Draw the next point following the polygon following the polygon line
 
-        next_x = prev_x + faceLength / 2.0 / GV.METER_2_MAP_RATIO * cos(atan(m1));
-        next_y = prev_y + faceLength / 2.0 / GV.METER_2_MAP_RATIO * sin(atan(m1));
+        next_x = prev_x + faceLength / 2.0 / GV.METER_2_MAP_RATIO * cos(atan(gradient));
+        next_y = prev_y + faceLength / 2.0 / GV.METER_2_MAP_RATIO * sin(atan(gradient));
 
-        booking.getPoints().addAll(next_x, next_y);
+        test.getPoints().addAll(next_x, next_y);
 
         // Normalise the length
-        next_x += area / faceLength / GV.METER_2_MAP_RATIO * cos(atan(m2));
-        next_y += area / faceLength / GV.METER_2_MAP_RATIO * sin(atan(m2));
+        next_x += area / faceLength / GV.METER_2_MAP_RATIO * cos(atan(gradient_ort));
+        next_y += area / faceLength / GV.METER_2_MAP_RATIO * sin(atan(gradient_ort));
         if (!plane.contains(next_x, next_y)) {
-            next_x -= 2 * area / faceLength / GV.METER_2_MAP_RATIO * cos(atan(m2));
-            next_y -= 2 * area / faceLength / GV.METER_2_MAP_RATIO * sin(atan(m2));
+            next_x -= 2 * area / faceLength / GV.METER_2_MAP_RATIO * cos(atan(gradient_ort));
+            next_y -= 2 * area / faceLength / GV.METER_2_MAP_RATIO * sin(atan(gradient_ort));
         }
 
-        booking.getPoints().addAll(next_x, next_y);
+        test.getPoints().addAll(next_x, next_y);
 
         // Normalise the length
-        next_x -= faceLength / GV.METER_2_MAP_RATIO * cos(atan(m1));
-        next_y -= faceLength / GV.METER_2_MAP_RATIO * sin(atan(m1));
+        next_x -= faceLength / GV.METER_2_MAP_RATIO * cos(atan(gradient));
+        next_y -= faceLength / GV.METER_2_MAP_RATIO * sin(atan(gradient));
         if (!plane.contains(next_x, next_y)) {
-            next_x += 2 * faceLength / GV.METER_2_MAP_RATIO * cos(atan(m1));
-            next_y += 2 * faceLength / GV.METER_2_MAP_RATIO * sin(atan(m1));
+            next_x += 2 * faceLength / GV.METER_2_MAP_RATIO * cos(atan(gradient));
+            next_y += 2 * faceLength / GV.METER_2_MAP_RATIO * sin(atan(gradient));
         }
 
-        booking.getPoints().addAll(next_x, next_y);
+        test.getPoints().addAll(next_x, next_y);
 
         // Normalise the length
-        next_x += area / faceLength / GV.METER_2_MAP_RATIO * cos(atan(m2));
-        next_y += area / faceLength / GV.METER_2_MAP_RATIO * sin(atan(m2));
-        if (round((next_y - yi) / (next_x - xi) * 100) != round(m1 * 100)) {
-            next_x -= 2 * area / faceLength / GV.METER_2_MAP_RATIO * cos(atan(m2));
-            next_y -= 2 * area / faceLength / GV.METER_2_MAP_RATIO * sin(atan(m2));
+        next_x -= area / faceLength / GV.METER_2_MAP_RATIO * cos(atan(gradient_ort));
+        next_y -= area / faceLength / GV.METER_2_MAP_RATIO * sin(atan(gradient_ort));
+        if (round((next_y - yi) / (next_x - xi) * 100) != round(gradient * 100)) {
+            next_x += 2 * area / faceLength / GV.METER_2_MAP_RATIO * cos(atan(gradient_ort));
+            next_y += 2 * area / faceLength / GV.METER_2_MAP_RATIO * sin(atan(gradient_ort));
         }
-        booking.getPoints().addAll(next_x, next_y, xi, yi);
-        
+        test.getPoints().addAll(next_x, next_y, xi, yi);
+
+        double[] center = getCenter(test);
+        if (test.contains(center[0], center[1])) {
+            booking.getPoints().addAll(test.getPoints());
+        } else {
+            booking.getPoints().addAll(oldPoints);
+            System.out.println("Work");
+        }
     }
 
+    /**
+     *
+     */
     public void removeTrans() {
         canvas.getChildren().forEach(e -> {
             e.getTransforms().removeAll(e.getTransforms());
@@ -435,6 +457,11 @@ public final class MapController {
         delY = 0;
     }
 
+    /**
+     *
+     * @param pol
+     * @return
+     */
     private double[] getCenter(Polygon pol) {
         double[] center = new double[2];
         center[0] = 0;
