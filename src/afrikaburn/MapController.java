@@ -44,6 +44,8 @@ public final class MapController {
     private boolean editing = false;
     private final Line one;
     private final Line two;
+    private final Line highLight;
+    private final Line lowLight;
 
     /**
      * @Description: Reads the map from the file (name must be
@@ -56,6 +58,8 @@ public final class MapController {
         this.canvas = map;
         one = new Line();
         two = new Line();
+        highLight = new Line();
+        lowLight = new Line();
         delX = 0;
         delY = 0;
         JSONReader reader
@@ -79,6 +83,10 @@ public final class MapController {
 
         one.setStrokeWidth(0.1);
         two.setStrokeWidth(0.1);
+        highLight.setStrokeWidth(0.2);
+        highLight.setStroke(Color.GREEN);
+        lowLight.setStrokeWidth(0.1);
+        lowLight.setStroke(Color.BLUE);
 
         for (Polygon current : mapPolygons) {
             current.setFill(Color.LIGHTGREY);
@@ -99,7 +107,7 @@ public final class MapController {
         }
 
         // The origin is in the top left hand corner, changes it to bottom left
-        canvas.getChildren().addAll(one, two);
+        canvas.getChildren().addAll(one, two, highLight, lowLight);
         canvas.setOnDragExited(e -> {
             editing = false;
             clients[Integer.parseInt(e.getDragboard().getString().split(",")[0])].getArea().setOpacity(1);
@@ -277,12 +285,6 @@ public final class MapController {
         return abs(area);
     }
 
-    private double gradient(GeoLine line) {
-        double dy = line.getY2() - line.getY1();
-        double dx = line.getX2() - line.getX1();
-        return dy / dx;
-    }
-
     private double length(double x1, double y1, double x2, double y2) {
         return sqrt(pow(x1 - x2, 2) + pow(y1 - y2, 2));
     }
@@ -295,42 +297,81 @@ public final class MapController {
 
     private void moveBooking(Polygon plane, Polygon booking, double faceLength, double area, double mouseX, double mouseY) {
         // Declare two points and use the first two as default
-        double[] line_01 = new double[4];
-        double[] line_02 = 
+        double[] line_closest = new double[4];
+        double[] line_sec_closest = new double[4];
         double x1, y1, x2, y2;
-        double shortest = 0;
+
+        // Connect the first line to the last line.
+        x1 = plane.getPoints().get(0);
+        y1 = plane.getPoints().get(1);
+        x2 = plane.getPoints().get(plane.getPoints().size() - 2);
+        y2 = plane.getPoints().get(plane.getPoints().size() - 1);
+
+        line_closest[0] = x1;
+        line_closest[1] = y1;
+        line_closest[2] = x2;
+        line_closest[3] = y2;
+
+        line_sec_closest[0] = x1;
+        line_sec_closest[1] = y1;
+        line_sec_closest[2] = x2;
+        line_sec_closest[3] = y2;
+
+        double temp_distance = length((x1 + x2) / 2.0, (y1 + y2) / 2.0, mouseX, mouseY);
+
+        double shortest = temp_distance;
         double sec_shortest = shortest;
 
         // Find the line closest to the mouse pointer
-        for (int x = 2; x < plane.getPoints().size() - 2; x += 2) {
+        // Start at 2 because the first coordinates are already the default
+        for (int x = 0; x < plane.getPoints().size() - 2; x += 2) {
             x1 = plane.getPoints().get(x);
             y1 = plane.getPoints().get(x + 1);
             x2 = plane.getPoints().get(x + 2);
             y2 = plane.getPoints().get(x + 3);
-            double temp_distance = length((x1 + x2) / 2.0, (y1 + y2) / 2.0, mouseX, mouseY);
-            
+
+            temp_distance = length((x1 + x2) / 2.0, (y1 + y2) / 2.0, mouseX, mouseY);
+
             if (temp_distance < shortest) {
-                line_01[0] = x1;
-                line_01[1] = y1;
-                line_01[2] = x2;
-                line_01[3] = y2;
-                        
+                line_closest[0] = x1;
+                line_closest[1] = y1;
+                line_closest[2] = x2;
+                line_closest[3] = y2;
+
                 shortest = temp_distance;
+
             } else if (temp_distance < sec_shortest) {
-                sec_closest = tmp;
+                line_sec_closest[0] = x1;
+                line_sec_closest[1] = y1;
+                line_sec_closest[2] = x2;
+                line_sec_closest[3] = y2;
+
                 sec_shortest = temp_distance;
             }
         }
 
+        highLight.setStartX(line_closest[0]);
+        highLight.setStartY(line_closest[1]);
+        highLight.setEndX(line_closest[2]);
+        highLight.setEndY(line_closest[3]);
+
+        lowLight.setStartX(line_sec_closest[0]);
+        lowLight.setStartY(line_sec_closest[1]);
+        lowLight.setEndX(line_sec_closest[2]);
+        lowLight.setEndY(line_sec_closest[3]);
+
+        System.out.println(highLight);
+        System.out.println(lowLight);
+
         // Find the closest point to the mouse pointer
-        double gradient_1 = gradient(closest);
+        double gradient_1 = gradient(line_closest[0], line_closest[1], line_closest[2], line_closest[3]);
         double gradient_ort_1 = -1 / gradient_1;
-        double offset_1 = closest.getCent()[1] - gradient_1 * closest.getCent()[0];
+        double offset_1 = (line_closest[1] + line_closest[3]) / 2.0 - gradient_1 * (line_closest[0] + line_closest[2]) / 2.0;
         double offset_ort_1 = mouseY - gradient_ort_1 * mouseX;
 
-        double gradient_2 = gradient(sec_closest);
+        double gradient_2 = gradient(line_sec_closest[0], line_sec_closest[1], line_sec_closest[2], line_sec_closest[3]);
         double gradient_ort_2 = -1 / gradient_2;
-        double offset_2 = sec_closest.getCent()[1] - gradient_2 * sec_closest.getCent()[0];
+        double offset_2 = (line_sec_closest[1] + line_sec_closest[3]) / 2.0 - gradient_2 * (line_sec_closest[0] + line_sec_closest[2]) / 2.0;
         double offset_ort_2 = mouseY - gradient_ort_2 * mouseX;
 
         double xi_1;
@@ -343,42 +384,33 @@ public final class MapController {
         double gradient_ort;
 
         if (gradient_ort_1 == 0) {
-            xi_1 = closest.getCent()[0];
+            xi_1 = (line_closest[0] + line_closest[2]) / 2.0;
             yi_1 = mouseY;
         } else if (gradient_1 == 0) {
             xi_1 = mouseX;
-            yi_1 = closest.getCent()[1];
+            yi_1 = (line_closest[1] + line_closest[3]) / 2.0;
         } else {
             xi_1 = (offset_ort_1 - offset_1) / (gradient_1 - gradient_ort_1);
             yi_1 = gradient_1 * xi_1 + offset_1;
         }
 
         if (gradient_ort_2 == 0) {
-            xi_2 = sec_closest.getCent()[0];
+            xi_2 = (line_sec_closest[0] + line_sec_closest[2]) / 2.0;
             yi_2 = mouseY;
         } else if (gradient_2 == 0) {
             xi_2 = mouseX;
-            yi_2 = sec_closest.getCent()[1];
+            yi_2 = (line_sec_closest[1] + line_sec_closest[3]) / 2.0;
         } else {
             xi_2 = (offset_ort_2 - offset_2) / (gradient_2 - gradient_ort_2);
             yi_2 = gradient_2 * xi_2 + offset_2;
         }
 
-        if (length(xi_1, yi_1, mouseX, mouseY) < length(xi_2, yi_2, mouseX, mouseY)) {
-            xi = xi_1;
-            yi = yi_1;
-            gradient = gradient_1;
-            gradient_ort = gradient_ort_1;
-            one.setStroke(Color.RED);
-            two.setStroke(Color.BLACK);
-        } else {
-            xi = xi_2;
-            yi = yi_2;
-            gradient = gradient_2;
-            gradient_ort = gradient_ort_2;
-            two.setStroke(Color.RED);
-            one.setStroke(Color.BLACK);
-        }
+        xi = xi_1;
+        yi = yi_1;
+        gradient = gradient_1;
+        gradient_ort = gradient_ort_1;
+        one.setStroke(Color.RED);
+        two.setStroke(Color.BLACK);
 
         one.setStartX(mouseX);
         one.setStartY(mouseY);
@@ -401,49 +433,52 @@ public final class MapController {
         booking.getPoints().removeAll(oldPoints);
 
         test.getPoints().addAll(xi, yi);
-        // Draw the next point following the polygon following the polygon line
 
-        next_x = prev_x + faceLength / 2.0 / GV.METER_2_MAP_RATIO * cos(atan(gradient));
-        next_y = prev_y + faceLength / 2.0 / GV.METER_2_MAP_RATIO * sin(atan(gradient));
+        // Draw the block
+        if (!plane.contains(xi + area / faceLength / GV.METER_2_MAP_RATIO * cos(atan(gradient_ort)), yi + area / faceLength / GV.METER_2_MAP_RATIO * sin(atan(gradient_ort)))) {
+            // First Point
+            next_x = prev_x + faceLength / 2.0 / GV.METER_2_MAP_RATIO * cos(atan(gradient));
+            next_y = prev_y + faceLength / 2.0 / GV.METER_2_MAP_RATIO * sin(atan(gradient));
+            test.getPoints().addAll(next_x, next_y);
 
-        test.getPoints().addAll(next_x, next_y);
+            // Second Point
+            next_x -= area / faceLength / GV.METER_2_MAP_RATIO * cos(atan(gradient_ort));
+            next_y -= area / faceLength / GV.METER_2_MAP_RATIO * sin(atan(gradient_ort));
+            test.getPoints().addAll(next_x, next_y);
 
-        // Normalise the length
-        next_x += area / faceLength / GV.METER_2_MAP_RATIO * cos(atan(gradient_ort));
-        next_y += area / faceLength / GV.METER_2_MAP_RATIO * sin(atan(gradient_ort));
-        if (!plane.contains(next_x, next_y)) {
-            next_x -= 2 * area / faceLength / GV.METER_2_MAP_RATIO * cos(atan(gradient_ort));
-            next_y -= 2 * area / faceLength / GV.METER_2_MAP_RATIO * sin(atan(gradient_ort));
+            // Third Point
+            next_x -= faceLength / GV.METER_2_MAP_RATIO * cos(atan(gradient));
+            next_y -= faceLength / GV.METER_2_MAP_RATIO * sin(atan(gradient));
+            test.getPoints().addAll(next_x, next_y);
+
+            // Fourth Point
+            next_x += area / faceLength / GV.METER_2_MAP_RATIO * cos(atan(gradient_ort));
+            next_y += area / faceLength / GV.METER_2_MAP_RATIO * sin(atan(gradient_ort));
+            test.getPoints().addAll(next_x, next_y, xi, yi);
+        } else {
+            // First Point
+            next_x = prev_x + faceLength / 2.0 / GV.METER_2_MAP_RATIO * cos(atan(gradient));
+            next_y = prev_y + faceLength / 2.0 / GV.METER_2_MAP_RATIO * sin(atan(gradient));
+            test.getPoints().addAll(next_x, next_y);
+
+            // Second Point
+            next_x += area / faceLength / GV.METER_2_MAP_RATIO * cos(atan(gradient_ort));
+            next_y += area / faceLength / GV.METER_2_MAP_RATIO * sin(atan(gradient_ort));
+            test.getPoints().addAll(next_x, next_y);
+
+            // Third Point
+            next_x -= faceLength / GV.METER_2_MAP_RATIO * cos(atan(gradient));
+            next_y -= faceLength / GV.METER_2_MAP_RATIO * sin(atan(gradient));
+            test.getPoints().addAll(next_x, next_y);
+
+            // Fourth Point
+            next_x -= area / faceLength / GV.METER_2_MAP_RATIO * cos(atan(gradient_ort));
+            next_y -= area / faceLength / GV.METER_2_MAP_RATIO * sin(atan(gradient_ort));
+            test.getPoints().addAll(next_x, next_y, xi, yi);
         }
-
-        test.getPoints().addAll(next_x, next_y);
-
-        // Normalise the length
-        next_x -= faceLength / GV.METER_2_MAP_RATIO * cos(atan(gradient));
-        next_y -= faceLength / GV.METER_2_MAP_RATIO * sin(atan(gradient));
-        if (!plane.contains(next_x, next_y)) {
-            next_x += 2 * faceLength / GV.METER_2_MAP_RATIO * cos(atan(gradient));
-            next_y += 2 * faceLength / GV.METER_2_MAP_RATIO * sin(atan(gradient));
-        }
-
-        test.getPoints().addAll(next_x, next_y);
-
-        // Normalise the length
-        next_x -= area / faceLength / GV.METER_2_MAP_RATIO * cos(atan(gradient_ort));
-        next_y -= area / faceLength / GV.METER_2_MAP_RATIO * sin(atan(gradient_ort));
-        if (round((next_y - yi) / (next_x - xi) * 100) != round(gradient * 100)) {
-            next_x += 2 * area / faceLength / GV.METER_2_MAP_RATIO * cos(atan(gradient_ort));
-            next_y += 2 * area / faceLength / GV.METER_2_MAP_RATIO * sin(atan(gradient_ort));
-        }
-        test.getPoints().addAll(next_x, next_y, xi, yi);
 
         double[] center = getCenter(test);
-        if (test.contains(center[0], center[1])) {
-            booking.getPoints().addAll(test.getPoints());
-        } else {
-            booking.getPoints().addAll(oldPoints);
-            System.out.println("Work");
-        }
+        booking.getPoints().addAll(test.getPoints());
     }
 
     /**
