@@ -61,12 +61,12 @@ public final class MapController {
         this.map = map;
         this.clientList = clientList;
         this.csvData = csvData;
-
+        
         yMin = new double[2];
         yMax = new double[2];
         xMin = new double[2];
         xMax = new double[2];
-
+        
         JSONReader reader = new JSONReader(jsonData);
         mapPolygons = reader.polygons();
         minMax();
@@ -84,12 +84,12 @@ public final class MapController {
                 tmpPolygon.set(coords + 1, (tmpPolygon.get(coords + 1) - yMin[0]) / BIGGEST_EDGE * (map.getWidth() > map.getHeight() ? map.getWidth() : map.getHeight()));
             }
         }
-
+        
         yMin[1] = yMin[0] / BIGGEST_EDGE * (map.getWidth() > map.getHeight() ? map.getWidth() : map.getHeight());
         yMax[1] = yMax[0] / BIGGEST_EDGE * (map.getWidth() > map.getHeight() ? map.getWidth() : map.getHeight());
         xMin[1] = xMin[0] / BIGGEST_EDGE * (map.getWidth() > map.getHeight() ? map.getWidth() : map.getHeight());
         xMax[1] = xMax[0] / BIGGEST_EDGE * (map.getWidth() > map.getHeight() ? map.getWidth() : map.getHeight());
-
+        
         setupMap();
     }
 
@@ -104,7 +104,7 @@ public final class MapController {
             setMapListeners(current);
             map.getChildren().add(current);
         }
-
+        
         bookings.stream().map((current) -> {
             setClientListeners(current.getArea());
             setClientListeners(current.getText());
@@ -126,10 +126,10 @@ public final class MapController {
             bookings.get(Integer.parseInt(e.getDragboard().getString().split(",")[0])).getArea().setOpacity(1);
             e.consume();
         });
-
+        
         map.getTransforms().add(new Rotate(0, map.getWidth() / 2, map.getHeight() / 2));
     }
-
+    
     public void addBooking(Booking booking) {
         setClientListeners(booking.getArea());
         setClientListeners(booking.getText());
@@ -145,26 +145,27 @@ public final class MapController {
             infoLabel.setText("Total Area: " + round(area(mapCurrent) * 100)
                     / 100.0 + " m\u00B2");
         });
-
+        
         mapCurrent.setOnDragDropped(e -> {
             Dragboard db = e.getDragboard();
             boolean success = false;
-
+            
             if (db.hasString()) {
                 String nodeId = db.getString();
                 success = true;
+                infoLabel.setText("Client Placed.");
                 updateFile();
             }
             e.setDropCompleted(success);
             e.consume();
         });
-
+        
         mapCurrent.setOnDragOver((DragEvent e) -> {
             if (e.getDragboard().hasString()) {
                 e.acceptTransferModes(TransferMode.MOVE);
                 Polygon booking = bookings.get(Integer.parseInt(e.getDragboard().getString().split(",")[0])).getArea();
                 Text label = bookings.get(Integer.parseInt(e.getDragboard().getString().split(",")[0])).getText();
-
+                
                 moveShow(mapCurrent,
                         booking,
                         label,
@@ -175,19 +176,20 @@ public final class MapController {
             }
             e.consume();
         });
-
+        
         mapCurrent.setOnDragEntered((DragEvent e) -> {
             if (e.getDragboard().hasString()) {
                 Polygon booking = bookings.get(Integer.parseInt(e.getDragboard().getString().split(",")[0])).getArea();
                 Text label = bookings.get(Integer.parseInt(e.getDragboard().getString().split(",")[0])).getText();
                 booking.setVisible(true);
-
+                
                 if (!map.getChildren().contains(booking)) {
                     booking.getTransforms().addAll(mapPolygons[0].getTransforms());
                     label.getTransforms().addAll(mapPolygons[0].getTransforms());
                     map.getChildren().addAll(booking, label);
                     ((Text) clientList.getChildren().get(bookings.get(Integer.parseInt(e.getDragboard().getString().split(",")[0])).getId())).setFill(Color.web("#6E6E6E"));
                     bookings.get(Integer.parseInt(e.getDragboard().getString().split(",")[0])).isPlaced(true);
+                    infoLabel.setText("Client Booking in Progress.");
                 }
             }
         });
@@ -198,26 +200,27 @@ public final class MapController {
         clientCurrent.setOnDragDropped(e -> {
             Dragboard db = e.getDragboard();
             boolean success = false;
-
+            
             if (db.hasString()) {
                 String nodeId = db.getString();
                 success = true;
+                infoLabel.setText("Client Placed.");
                 updateFile();
             }
             e.setDropCompleted(success);
             e.consume();
         });
-
+        
         clientCurrent.setOnDragOver((DragEvent e) -> {
             if (e.getDragboard().hasString()) {
-
+                
                 e.acceptTransferModes(TransferMode.MOVE);
-
+                
                 if (e.getDragboard().getString().split(",")[1].equalsIgnoreCase("booking")) {
                     double[] center = getCenter(clientCurrent);
                     for (Polygon plane : mapPolygons) {
                         if (plane.contains(center[0], center[1])) {
-
+                            
                             moveShow(plane,
                                     bookings.get(Integer.parseInt(e.getDragboard().getString().split(",")[0])).getArea(),
                                     bookings.get(Integer.parseInt(e.getDragboard().getString().split(",")[0])).getText(),
@@ -281,7 +284,7 @@ public final class MapController {
                 tmpPolygon.set(coords + 1, (tmpPolygon.get(coords + 1) - yMin[0]) / BIGGEST_EDGE * (map.getWidth() > map.getHeight() ? map.getWidth() : map.getHeight()));
             }
         }
-
+        
         bookings.stream().map((booking) -> booking.getArea().getPoints()).forEachOrdered((tmpPolygon) -> {
             for (int coords = 0; coords < tmpPolygon.size(); coords += 2) {
                 tmpPolygon.set(coords, (tmpPolygon.get(coords) - xMin[0]) / BIGGEST_EDGE * (map.getWidth() > map.getHeight() ? map.getWidth() : map.getHeight()));
@@ -289,7 +292,7 @@ public final class MapController {
             }
         });
     }
-
+    
     public void portMapFrom() {
         //Find the smallest edge of map
         final double DEL_Y = Math.abs(yMax[0] - yMin[0]);
@@ -338,13 +341,13 @@ public final class MapController {
                 .filter((x) -> (x instanceof Scale))
                 .map((x) -> x.getMxx())
                 .reduce(oldScale, (accumulator, _item) -> accumulator * _item);
-
+        
         Scale scale = new Scale();
         scale.setPivotX((GV.SCREEN_W / 5 + GV.SCREEN_W * 2 / 5));
         scale.setPivotY((GV.SCREEN_H * 0.9) / 2);
         scale.setX(GV.ZOOM_AMOUNT * oldScale);
         scale.setY(GV.ZOOM_AMOUNT * oldScale);
-
+        
         for (int i = map.getTransforms().size() - 1; i >= 0; i--) {
             if (map.getTransforms().get(i) instanceof Scale) {
                 map.getTransforms().remove(map.getTransforms().get(i));
@@ -364,13 +367,13 @@ public final class MapController {
                 .filter((x) -> (x instanceof Scale))
                 .map((x) -> x.getMxx())
                 .reduce(oldScale, (accumulator, _item) -> accumulator * _item);
-
+        
         Scale scale = new Scale();
         scale.setPivotX((GV.SCREEN_W / 5 + GV.SCREEN_W * 2 / 5));
         scale.setPivotY((GV.SCREEN_H * 0.9) / 2);
         scale.setX(oldScale / GV.ZOOM_AMOUNT);
         scale.setY(oldScale / GV.ZOOM_AMOUNT);
-
+        
         for (int i = map.getTransforms().size() - 1; i >= 0; i--) {
             if (map.getTransforms().get(i) instanceof Scale) {
                 map.getTransforms().remove(map.getTransforms().get(i));
@@ -398,21 +401,17 @@ public final class MapController {
         area *= GV.METER_SQUARED_2_MAP_RATIO;
         return abs(area);
     }
-
+    
     private double length(double x1, double y1, double x2, double y2) {
         return sqrt(pow(x1 - x2, 2) + pow(y1 - y2, 2));
     }
-
+    
     private double gradient(double x1, double y1, double x2, double y2) {
         double dy = y2 - y1;
         double dx = x2 - x1;
         return round(dy / dx * 100) / 100.0;
     }
-
-    private void moveClient() {
-        // Insert code to move client here.
-    }
-
+    
     private void moveShow(Polygon plane, Polygon booking, Text label, double faceLength, double area, double mouseX, double mouseY) {
 
         // Declare two points and use the first two as default
@@ -425,7 +424,7 @@ public final class MapController {
         y1 = plane.getPoints().get(plane.getPoints().size() - 1);
         x2 = plane.getPoints().get(0);
         y2 = plane.getPoints().get(1);
-
+        
         line_closest[0] = x1;
         line_closest[1] = y1;
         line_closest[2] = x2;
@@ -441,16 +440,16 @@ public final class MapController {
             // Length between two points of polygon
             double line_length = length(x1, y1, x2, y2);
             double gradient = gradient(x1, y1, x2, y2);
-
+            
             for (int i = 0; i < line_length; i++) {
                 temp_distance = length(x1 + signum(x2 - x1) * i * abs(cos(atan(gradient))), y1 + signum(y2 - y1) * i * abs(sin(atan(gradient))), mouseX, mouseY);
-
+                
                 if (temp_distance < shortest) {
                     line_closest[0] = x1;
                     line_closest[1] = y1;
                     line_closest[2] = x2;
                     line_closest[3] = y2;
-
+                    
                     polygonIndex = i;
                     shortest = temp_distance;
                 }
@@ -474,7 +473,7 @@ public final class MapController {
         double offset_ort_1 = mouseY - gradient_ort * mouseX;
         double xi;
         double yi;
-
+        
         if (gradient > 1e10) {
             xi = (line_closest[0] + line_closest[2]) / 2.0;
             yi = mouseY;
@@ -491,10 +490,10 @@ public final class MapController {
         double prev_y = yi; // Next point on the polygon.
         double next_x;
         double next_y;
-
+        
         ObservableList<Double> oldPoints = booking.getPoints();
         Polygon test = new Polygon();
-
+        
         test.getPoints().addAll(xi, yi);
 
         // Draw the block
@@ -550,9 +549,9 @@ public final class MapController {
             next_y -= area / faceLength / GV.METER_2_MAP_RATIO * sin(atan(gradient_ort));
             test.getPoints().addAll(next_x, next_y, xi, yi);
         }
-
+        
         double[] center = getCenter(test);
-
+        
         if (plane.contains(center[0], center[1])) {
             booking.getPoints().removeAll(oldPoints);
             booking.getPoints().addAll(test.getPoints());
@@ -570,13 +569,13 @@ public final class MapController {
     public double[] getCenter(Shape shape) {
         return new double[]{(shape.getLayoutBounds().getMaxX() + shape.getLayoutBounds().getMinX()) / 2.0, (shape.getLayoutBounds().getMaxY() + shape.getLayoutBounds().getMinY()) / 2.0};
     }
-
+    
     public void updateFile() {
         BufferedWriter writer = null;
         try {
             File output = new File("resources/" + csvData.getName());
             writer = new BufferedWriter(new FileWriter(output));
-
+            
             for (Booking booking : bookings) {
                 String points = booking.getArea().getPoints().toString().replaceAll(",", ";");
                 String colour = booking.getArea().getFill().toString();
@@ -593,18 +592,18 @@ public final class MapController {
             try {
                 // Close the writer regardless of what happens
                 writer.close();
-
+                
             } catch (IOException ex) {
                 Logger.getLogger(Controller.class
                         .getName()).log(Level.SEVERE, null, ex);
             }
         }
     }
-
+    
     public double[] getLayout() {
         return new double[]{xMin[1], yMin[1], xMax[1], yMax[1]};
     }
-
+    
     public Polygon[] getMapPolygons() {
         return mapPolygons;
     }

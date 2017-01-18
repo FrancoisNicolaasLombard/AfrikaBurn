@@ -44,6 +44,8 @@ import javax.imageio.ImageIO;
 import com.fasterxml.jackson.core.JsonGenerationException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import javafx.scene.image.Image;
+import javafx.scene.input.DragEvent;
 
 /**
  *
@@ -407,6 +409,18 @@ public class Controller implements Initializable {
 
         setUpProgram();
 
+        clientList.setOnDragEntered((DragEvent e) -> {
+            if (e.getDragboard().hasString() && bookings.get(Integer.parseInt(e.getDragboard().getString().split(",")[0])).isPlaced()) {
+                int bookingNr = bookings.get(Integer.parseInt(e.getDragboard().getString().split(",")[0])).getId();
+                ((Text) clientList.getChildren().get(bookingNr)).setFill(Color.WHITE);
+                bookings.get(bookingNr).clearShape();
+                bookings.get(bookingNr).getArea().getTransforms().removeAll(bookings.get(bookingNr).getArea().getTransforms());
+                bookings.get(bookingNr).getText().getTransforms().removeAll(bookings.get(bookingNr).getText().getTransforms());
+                map.getChildren().removeAll(bookings.get(bookingNr).getArea(), bookings.get(bookingNr).getText());
+                mapBuild.updateFile();
+                infoLabel.setText("Client Booking Removed.");
+            }
+        });
     }
 
     /**
@@ -447,10 +461,12 @@ public class Controller implements Initializable {
         });
 
         exportMapSVG.setOnAction(e -> {
+            mapBuild.portMapFrom();
             SVGWriter svgWriter = new SVGWriter(mapBuild.getMapPolygons(),
                     bookings,
                     mapBuild.getLayout()[2] - mapBuild.getLayout()[0],
                     mapBuild.getLayout()[3] - mapBuild.getLayout()[1]);
+            mapBuild.portMapTo();
         });
 
         exportMapKMZ.setOnAction(e -> {
@@ -603,6 +619,7 @@ public class Controller implements Initializable {
         this.window = window;
         window.setMaximized(true);
         content = new Scene(root, window.getWidth(), window.getHeight());
+        window.getIcons().add(new Image("Icon.png"));
         window.setTitle("Afrika Burn Map");
         window.setScene(content);
         window.show();

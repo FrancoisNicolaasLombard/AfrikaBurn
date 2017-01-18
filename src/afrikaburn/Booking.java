@@ -42,7 +42,7 @@ public class Booking {
                 + "\n" + (isSexy ? "Erotic" : "Safe"));
 
         onDescription.setFontSmoothingType(FontSmoothingType.LCD);
-        onDescription.setStyle("-fx-font-size: 3; -fx-font-weight: normal; -fx-alignment:center;");
+        onDescription.setStyle("-fx-font-size: 5; -fx-font-weight: normal; -fx-alignment:center;");
         onDescription.setTextAlignment(TextAlignment.CENTER);
         onDescription.setTextOrigin(VPos.CENTER);
 

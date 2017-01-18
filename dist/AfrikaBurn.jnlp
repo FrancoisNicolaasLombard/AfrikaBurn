@@ -8,7 +8,7 @@
   </information>
   <resources>
     <j2se version="1.6+" java-vm-args="-Xmx6g "  href="http://java.sun.com/products/autodl/j2se"/>
-    <jar href="AfrikaBurn.jar" size="101863" download="eager" />
+    <jar href="AfrikaBurn.jar" size="98875" download="eager" />
     <jar href="lib\com.fasterxml.jackson.core.jar" size="206234" download="eager" />
     <jar href="lib\com.fasterxml.jackson.databind.jar" size="920971" download="eager" />
     <jar href="lib\commons-io-2.5-javadoc.jar" size="765022" download="eager" />
@@ -16,6 +16,7 @@
     <jar href="lib\gson-2.2.2.jar" size="189285" download="eager" />
     <jar href="lib\jackson-annotations-2.1.2.jar" size="34474" download="eager" />
     <jar href="lib\java-json.jar" size="84697" download="eager" />
+    <jar href="lib\javaapiforkml-2.2.0.jar" size="619507" download="eager" />
   </resources>
   <applet-desc  width="800" height="600" main-class="com.javafx.main.NoJavaFXFallback"  name="AfrikaBurn" >
     <param name="requiredFXVersion" value="8.0+"/>
