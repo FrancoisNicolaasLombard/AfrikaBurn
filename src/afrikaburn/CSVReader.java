@@ -2,6 +2,7 @@ package afrikaburn;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.util.ArrayList;
 import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -15,21 +16,32 @@ import java.util.logging.Logger;
  */
 public class CSVReader {
 
-    private Booking[] client;
-    private int nrClients;
+    private ArrayList<Booking> bookings;
 
-    CSVReader() {
-        client = new Booking[nrClients()];
+    CSVReader(File file) {
+        bookings = new ArrayList<>();
         try {
-            try (Scanner input = new Scanner(new File("resources/campers.csv"))) {
+            try (Scanner input = new Scanner(file)) {
                 int count = 0;
                 while (input.hasNextLine()) {
                     String[] elements = input.nextLine().split(",");
-                    client[count++] = new Booking(count - 1, elements[0],
-                            Double.parseDouble(elements[1]),
-                            Double.parseDouble(elements[2]),
-                            elements[3].equalsIgnoreCase("yes"),
-                            elements[4].equalsIgnoreCase("yes"));
+                    if (elements[0].equalsIgnoreCase("booking")) {
+                        if (!elements[6].equals("[]") || elements.length != 8) {
+                            bookings.add(new ShowBooking(count++, elements[1],
+                                    Double.parseDouble(elements[2]),
+                                    Double.parseDouble(elements[3]),
+                                    elements[4].equalsIgnoreCase("true"),
+                                    elements[5].equalsIgnoreCase("true"),
+                                    elements[6], elements[7]));
+                        } else {
+                            bookings.add(new ShowBooking(count++, elements[1],
+                                    Double.parseDouble(elements[2]),
+                                    Double.parseDouble(elements[3]),
+                                    elements[4].equalsIgnoreCase("true"),
+                                    elements[5].equalsIgnoreCase("true"),
+                                    "[-1.0; -1.0]", "0xffffffff"));
+                        }
+                    }
                 }
             }
         } catch (FileNotFoundException ex) {
@@ -37,34 +49,7 @@ public class CSVReader {
         }
     }
 
-    private int nrClients() {
-        nrClients = 0;
-        try {
-            try (Scanner input = new Scanner(new File("resources/campers.csv"))) {
-                while (input.hasNextLine()) {
-                    input.nextLine();
-                    nrClients++;
-                }
-            }
-        } catch (FileNotFoundException ex) {
-            Logger.getLogger(CSVReader.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        return nrClients;
-    }
-
-    private String[] getNames() {
-        String[] names = new String[client.length];
-        for (int x = 0; x < client.length; x++) {
-            names[x] = client[x].getName();
-        }
-        return names;
-    }
-
-    public Booking[] getClients() {
-        return client;
-    }
-    
-    public int getNrClients(){
-        return nrClients;
+    public ArrayList<Booking> getClients() {
+        return bookings;
     }
 }

@@ -9,7 +9,7 @@ and open the template in the editor.
 */
 
 .root{
-    -fx-font-size: 11pt;
+    -fx-font-size: 12pt;
     -fx-font-family: "Verdana";
     -fx-base: #999999;
 }
@@ -31,3 +31,4 @@ Inline style for the menu buttons
 .vbox-canvas{
     -fx-background-color: white;
 }
+

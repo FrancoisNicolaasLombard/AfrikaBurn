@@ -7,28 +7,23 @@ import javafx.scene.Parent;
 import javafx.stage.Stage;
 
 /**
- * @Author:         FN Lombard
- * @Company:        VASTech
- * @Description:    This program runs a GUI to enable the user to do the layout
- *                  for AfrikaBurn
- * 
- * @Notes:          This program requires Java 1.8 to run, since it uses Lambda 
- *                  commands to simplify the code and make it more readable.
+ * @Author: FN Lombard
+ * @Company: VASTech
+ * @Description: This program runs a GUI to enable the user to do the layout for
+ * AfrikaBurn
+ *
+ * @Notes: This program requires Java 1.8 to run, since it uses Lambda commands
+ * to simplify the code and make it more readable.
  */
-
 public class AfrikaBurn extends Application {
 
-    // Components
-    private final String cobraCSS = "Resources/Cobra.css";
-    private Stage window;
-    
     // Overrides launch method from the Application Class
     @Override
     public void start(Stage primaryStage) throws Exception {
-        window = primaryStage;
+        Stage window = primaryStage;
         FXMLLoader loader = new FXMLLoader(getClass().getResource("View.fxml"));
-        Parent root = (Parent)loader.load();
-        Controller controller = (Controller)loader.getController();
+        Parent root = (Parent) loader.load();
+        Controller controller = (Controller) loader.getController();
         controller.setWindow(window, root);
     }
 

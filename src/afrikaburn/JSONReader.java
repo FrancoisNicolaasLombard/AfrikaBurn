@@ -2,11 +2,19 @@ package afrikaburn;
 
 import javafx.scene.shape.Polygon;
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.util.Scanner;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import static java.lang.Math.cos;
+import static java.lang.Math.toRadians;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.regex.Pattern;
+import javafx.scene.paint.Color;
+import javafx.scene.paint.Paint;
+import org.apache.commons.io.IOUtils;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 /**
  *
@@ -19,8 +27,6 @@ public class JSONReader {
 
     // Class variables
     private final File map;
-    private final String decimalPattern = "([0-9]*)\\.([0-9]*)";
-    private int totalPolygons;
     private Polygon[] polygons;
 
     JSONReader(File map) {
@@ -33,75 +39,52 @@ public class JSONReader {
      * @return
      */
     public Polygon[] polygons() {
-        countPolygons();
-        int currentPolygon = -1;
-        boolean foundNext = false;
-        polygons = new Polygon[totalPolygons];
-        try {
-            try (Scanner input = new Scanner(map)) {
-                while (input.hasNext() && totalPolygons != currentPolygon) {
-                    String token = input.next();
-                    if (token.toLowerCase().contains("polygon")) {
-                        foundNext = true;
-                        currentPolygon++;
-                        polygons[currentPolygon] = new Polygon();
-                    } else if (token.toLowerCase().contains("properties")) {
-                        foundNext = false;
-                    } else if (Pattern.matches(decimalPattern,
-                            token.replace(",", ""))
-                            && !token.replace(",", "").equals("0")
-                            && !token.replace(",", "").equals("0.0")
-                            && foundNext) {
+        if (map.exists()) {
+            InputStream is = null;
+            try {
+                is = new FileInputStream(map);
+                String jsontxt = IOUtils.toString(is);
+                JSONObject json = new JSONObject(jsontxt);
+                JSONArray objects = json.getJSONArray("features");
+                polygons = new Polygon[objects.length()];
 
-                        token = token.replace(",", "");
+                for (int i = 0; i < polygons.length; i++) {
+                    polygons[i] = new Polygon();
+                    JSONObject objectGeo = objects.getJSONObject(i).getJSONObject("geometry");
+                    JSONObject objectProperties = objects.getJSONObject(i).getJSONObject("properties");
 
-                        /*
-                        This method of mapping does not work.. rather using
+                    JSONArray objectCoords = objectGeo.getJSONArray("coordinates").getJSONArray(0);
+                    try {
+                        polygons[i].setStrokeWidth(objectProperties.getDouble("stroke-width"));
+                    } catch (JSONException e) {
+                        polygons[i].setStrokeWidth(1); // Default Value
+                        System.out.println(e.getMessage());
+                    }
+                    try {
+                        polygons[i].setFill(Paint.valueOf(objectProperties.getString("fill")));
+                    } catch (JSONException e) {
+                        polygons[i].setFill(Color.GRAY);
+                        System.out.println(e.getMessage());
+                    }
+
+                    // Add the points to the polygon
+                    for (int j = 0; j < objectCoords.length(); j++) {
+                        double lat = objectCoords.getJSONArray(j).getDouble(0);
+                        double lon = objectCoords.getJSONArray(j).getDouble(1);
+                        // Ignore the latitude;
+                        /* This method of mapping does not work.. rather using
                         the 1:1 approximation when dealing with small areas 
-                        that x = longitude and y = latitude
-                        */
-                        
-                        double lat = Double.parseDouble(token);
-                        token = input.next().replace(",", "");
-                        double lon = Double.parseDouble(token);
-                        polygons[currentPolygon].getPoints().addAll(lat, -lon);
+                        that x = longitude and y = latitude. */
+                        polygons[i].getPoints().addAll(lat, -lon);
                     }
                 }
+                is.close();
+            } catch (IOException | JSONException ex) {
+                Logger.getLogger(JSONReader.class.getName()).log(Level.SEVERE, null, ex);
             }
-        } catch (FileNotFoundException ex) {
-            Logger.getLogger(JSONReader.class.getName())
-                    .log(Level.SEVERE, null, ex);
+        } else {
+            System.out.println("Map does not exist.");
         }
         return polygons;
     }
-
-    /**
-     * Counts the total entries in the JSON file
-     */
-    private void countPolygons() {
-        int entries = 0;
-        try {
-            try (Scanner input = new Scanner(map)) {
-                while (input.hasNext()) {
-                    if (input.next().contains("Polygon")) {
-                        entries++;
-                    }
-                }
-            }
-        } catch (FileNotFoundException ex) {
-            Logger.getLogger(JSONReader.class.getName())
-                    .log(Level.SEVERE, null, ex);
-        }
-        totalPolygons = entries;
-    }
-
-    /**
-     * This method returns the number of land
-     *
-     * @return
-     */
-    public int getTotalPolygons() {
-        return totalPolygons;
-    }
-
 }
