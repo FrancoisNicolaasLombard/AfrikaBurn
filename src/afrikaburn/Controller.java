@@ -66,7 +66,7 @@ public class Controller implements Initializable {
     private MapController mapBuild;
     private Pane map, manageMaps;
     private ArrayList<Booking> bookings;
-    private Button exportMapPng, exportMapSVG, exportMapJSON, exportMapKMZ, chooseMap, chooseCSV;
+    private Button exportMapPng, exportMapJSON, exportMapKML, chooseMap, chooseCSV;
     private FileChooser fileChooser;
     private File csvData, jsonData;
 
@@ -257,6 +257,7 @@ public class Controller implements Initializable {
                 map.setVisible(false);
             }
 
+            mapBuild.resetMap();
             // Not enough RAM to export as one image
         } catch (IOException e) {
             System.out.println(e.getMessage());
@@ -406,6 +407,7 @@ public class Controller implements Initializable {
         cbLoud.getItems().addAll("TRUE", "FALSE");
         populateManageMaps();
         manageMaps.setVisible(false);
+        infoLabel.setText("This is the info label.");
 
         setUpProgram();
 
@@ -428,28 +430,24 @@ public class Controller implements Initializable {
      */
     private void populateManageMaps() {
         exportMapPng = new Button("Export Map to PNG");
-        exportMapSVG = new Button("Export Map to SVG");
-        exportMapKMZ = new Button("Export Map to KMZ");
+        exportMapKML = new Button("Export Map to KML");
         exportMapJSON = new Button("Export Map to JSON");
         chooseMap = new Button("Choose Map");
         chooseCSV = new Button("Choose CSV");
 
         exportMapPng.setLayoutX(20);
         exportMapPng.setLayoutY(20);
-        exportMapSVG.setLayoutX(20);
-        exportMapSVG.setLayoutY(60);
-        exportMapKMZ.setLayoutX(20);
-        exportMapKMZ.setLayoutY(100);
+        exportMapKML.setLayoutX(20);
+        exportMapKML.setLayoutY(60);
         exportMapJSON.setLayoutX(20);
-        exportMapJSON.setLayoutY(140);
+        exportMapJSON.setLayoutY(100);
         chooseMap.setLayoutX(20);
-        chooseMap.setLayoutY(180);
+        chooseMap.setLayoutY(140);
         chooseCSV.setLayoutX(20);
-        chooseCSV.setLayoutY(220);
+        chooseCSV.setLayoutY(180);
 
         exportMapPng.setMinWidth(200);
-        exportMapSVG.setMinWidth(200);
-        exportMapKMZ.setMinWidth(200);
+        exportMapKML.setMinWidth(200);
         exportMapJSON.setMinWidth(200);
         chooseMap.setMinWidth(200);
         chooseCSV.setMinWidth(200);
@@ -460,17 +458,12 @@ public class Controller implements Initializable {
             e.consume();
         });
 
-        exportMapSVG.setOnAction(e -> {
+        exportMapKML.setOnAction(e -> {
+            System.out.println("working");
             mapBuild.portMapFrom();
-            SVGWriter svgWriter = new SVGWriter(mapBuild.getMapPolygons(),
-                    bookings,
-                    mapBuild.getLayout()[2] - mapBuild.getLayout()[0],
-                    mapBuild.getLayout()[3] - mapBuild.getLayout()[1]);
+            KMLWriter kmlWriter = new KMLWriter(mapBuild.getMapPolygons(), bookings);
             mapBuild.portMapTo();
-        });
-
-        exportMapKMZ.setOnAction(e -> {
-            // TODO
+            e.consume();
         });
 
         exportMapJSON.setOnAction(e -> {
@@ -498,7 +491,7 @@ public class Controller implements Initializable {
             infoLabel.setText("New Clients have been Loaded.");
         });
 
-        manageMaps.getChildren().addAll(exportMapPng, exportMapSVG, exportMapKMZ, chooseMap, chooseCSV, exportMapJSON);
+        manageMaps.getChildren().addAll(exportMapPng, exportMapKML, chooseMap, chooseCSV, exportMapJSON);
     }
 
     /**

@@ -1,8 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <kml xmlns="http://www.opengis.net/kml/2.2">
 <Document>
-	<name>pm1.kml</name>
+	<name>AfrikaBurn Map</name>
 <Placemark>
+	<name>Map Polygon 1</name>
+	<Style>
+		<LineStyle>
+			<color>#dd000000</color>
+			<width>0.4</width>
+		</LineStyle>
+		<PolyStyle>
+			<color>#dd0038A8</color>
+		</PolyStyle>
+	</Style>
 	<Polygon>
 		<altitudeMode>relativeToGround</altitudeMode>
 		<outerBoundaryIs>
@@ -31,6 +41,16 @@
 </Placemark>
 
 <Placemark>
+	<name>Map Polygon 2</name>
+	<Style>
+		<LineStyle>
+			<color>#dd000000</color>
+			<width>0.4</width>
+		</LineStyle>
+		<PolyStyle>
+			<color>#dd0038A8</color>
+		</PolyStyle>
+	</Style>
 	<Polygon>
 		<altitudeMode>relativeToGround</altitudeMode>
 		<outerBoundaryIs>
@@ -82,6 +102,16 @@
 </Placemark>
 
 <Placemark>
+	<name>Map Polygon 3</name>
+	<Style>
+		<LineStyle>
+			<color>#dd000000</color>
+			<width>0.4</width>
+		</LineStyle>
+		<PolyStyle>
+			<color>#dd0038A8</color>
+		</PolyStyle>
+	</Style>
 	<Polygon>
 		<altitudeMode>relativeToGround</altitudeMode>
 		<outerBoundaryIs>
@@ -115,6 +145,16 @@
 </Placemark>
 
 <Placemark>
+	<name>Map Polygon 4</name>
+	<Style>
+		<LineStyle>
+			<color>#dd000000</color>
+			<width>0.4</width>
+		</LineStyle>
+		<PolyStyle>
+			<color>#dd0038A8</color>
+		</PolyStyle>
+	</Style>
 	<Polygon>
 		<altitudeMode>relativeToGround</altitudeMode>
 		<outerBoundaryIs>
@@ -142,6 +182,16 @@
 </Placemark>
 
 <Placemark>
+	<name>Map Polygon 5</name>
+	<Style>
+		<LineStyle>
+			<color>#dd000000</color>
+			<width>0.4</width>
+		</LineStyle>
+		<PolyStyle>
+			<color>#dd0038A8</color>
+		</PolyStyle>
+	</Style>
 	<Polygon>
 		<altitudeMode>relativeToGround</altitudeMode>
 		<outerBoundaryIs>
@@ -177,6 +227,16 @@
 </Placemark>
 
 <Placemark>
+	<name>Map Polygon 6</name>
+	<Style>
+		<LineStyle>
+			<color>#dd000000</color>
+			<width>0.4</width>
+		</LineStyle>
+		<PolyStyle>
+			<color>#dd0038A8</color>
+		</PolyStyle>
+	</Style>
 	<Polygon>
 		<altitudeMode>relativeToGround</altitudeMode>
 		<outerBoundaryIs>
@@ -215,6 +275,16 @@
 </Placemark>
 
 <Placemark>
+	<name>Map Polygon 7</name>
+	<Style>
+		<LineStyle>
+			<color>#dd000000</color>
+			<width>0.4</width>
+		</LineStyle>
+		<PolyStyle>
+			<color>#ddA88400</color>
+		</PolyStyle>
+	</Style>
 	<Polygon>
 		<altitudeMode>relativeToGround</altitudeMode>
 		<outerBoundaryIs>
@@ -262,6 +332,16 @@
 </Placemark>
 
 <Placemark>
+	<name>Map Polygon 8</name>
+	<Style>
+		<LineStyle>
+			<color>#dd000000</color>
+			<width>0.4</width>
+		</LineStyle>
+		<PolyStyle>
+			<color>#dd0038A8</color>
+		</PolyStyle>
+	</Style>
 	<Polygon>
 		<altitudeMode>relativeToGround</altitudeMode>
 		<outerBoundaryIs>
@@ -299,6 +379,16 @@
 </Placemark>
 
 <Placemark>
+	<name>Map Polygon 9</name>
+	<Style>
+		<LineStyle>
+			<color>#dd000000</color>
+			<width>0.4</width>
+		</LineStyle>
+		<PolyStyle>
+			<color>#ddA88400</color>
+		</PolyStyle>
+	</Style>
 	<Polygon>
 		<altitudeMode>relativeToGround</altitudeMode>
 		<outerBoundaryIs>
@@ -340,6 +430,16 @@
 </Placemark>
 
 <Placemark>
+	<name>Map Polygon 10</name>
+	<Style>
+		<LineStyle>
+			<color>#dd000000</color>
+			<width>0.4</width>
+		</LineStyle>
+		<PolyStyle>
+			<color>#ddA88400</color>
+		</PolyStyle>
+	</Style>
 	<Polygon>
 		<altitudeMode>relativeToGround</altitudeMode>
 		<outerBoundaryIs>
@@ -379,6 +479,16 @@
 </Placemark>
 
 <Placemark>
+	<name>Map Polygon 11</name>
+	<Style>
+		<LineStyle>
+			<color>#dd000000</color>
+			<width>0.4</width>
+		</LineStyle>
+		<PolyStyle>
+			<color>#ddA88400</color>
+		</PolyStyle>
+	</Style>
 	<Polygon>
 		<altitudeMode>relativeToGround</altitudeMode>
 		<outerBoundaryIs>
@@ -416,6 +526,16 @@
 </Placemark>
 
 <Placemark>
+	<name>Map Polygon 12</name>
+	<Style>
+		<LineStyle>
+			<color>#dd000000</color>
+			<width>0.4</width>
+		</LineStyle>
+		<PolyStyle>
+			<color>#ddA88400</color>
+		</PolyStyle>
+	</Style>
 	<Polygon>
 		<altitudeMode>relativeToGround</altitudeMode>
 		<outerBoundaryIs>
@@ -446,6 +566,16 @@
 </Placemark>
 
 <Placemark>
+	<name>Map Polygon 13</name>
+	<Style>
+		<LineStyle>
+			<color>#dd000000</color>
+			<width>0.4</width>
+		</LineStyle>
+		<PolyStyle>
+			<color>#ddA88400</color>
+		</PolyStyle>
+	</Style>
 	<Polygon>
 		<altitudeMode>relativeToGround</altitudeMode>
 		<outerBoundaryIs>
@@ -476,6 +606,16 @@
 </Placemark>
 
 <Placemark>
+	<name>Map Polygon 14</name>
+	<Style>
+		<LineStyle>
+			<color>#dd000000</color>
+			<width>0.4</width>
+		</LineStyle>
+		<PolyStyle>
+			<color>#ddA88400</color>
+		</PolyStyle>
+	</Style>
 	<Polygon>
 		<altitudeMode>relativeToGround</altitudeMode>
 		<outerBoundaryIs>
@@ -506,6 +646,16 @@
 </Placemark>
 
 <Placemark>
+	<name>Map Polygon 15</name>
+	<Style>
+		<LineStyle>
+			<color>#dd000000</color>
+			<width>0.4</width>
+		</LineStyle>
+		<PolyStyle>
+			<color>#ddA88400</color>
+		</PolyStyle>
+	</Style>
 	<Polygon>
 		<altitudeMode>relativeToGround</altitudeMode>
 		<outerBoundaryIs>
@@ -535,6 +685,16 @@
 </Placemark>
 
 <Placemark>
+	<name>Map Polygon 16</name>
+	<Style>
+		<LineStyle>
+			<color>#dd000000</color>
+			<width>0.4</width>
+		</LineStyle>
+		<PolyStyle>
+			<color>#ddA88400</color>
+		</PolyStyle>
+	</Style>
 	<Polygon>
 		<altitudeMode>relativeToGround</altitudeMode>
 		<outerBoundaryIs>
@@ -578,6 +738,16 @@
 </Placemark>
 
 <Placemark>
+	<name>Map Polygon 17</name>
+	<Style>
+		<LineStyle>
+			<color>#dd000000</color>
+			<width>0.4</width>
+		</LineStyle>
+		<PolyStyle>
+			<color>#ddA88400</color>
+		</PolyStyle>
+	</Style>
 	<Polygon>
 		<altitudeMode>relativeToGround</altitudeMode>
 		<outerBoundaryIs>
@@ -661,6 +831,16 @@
 </Placemark>
 
 <Placemark>
+	<name>Map Polygon 18</name>
+	<Style>
+		<LineStyle>
+			<color>#dd000000</color>
+			<width>0.4</width>
+		</LineStyle>
+		<PolyStyle>
+			<color>#dd0038A8</color>
+		</PolyStyle>
+	</Style>
 	<Polygon>
 		<altitudeMode>relativeToGround</altitudeMode>
 		<outerBoundaryIs>
@@ -697,6 +877,16 @@
 </Placemark>
 
 <Placemark>
+	<name>Map Polygon 19</name>
+	<Style>
+		<LineStyle>
+			<color>#dd000000</color>
+			<width>0.4</width>
+		</LineStyle>
+		<PolyStyle>
+			<color>#dd0038A8</color>
+		</PolyStyle>
+	</Style>
 	<Polygon>
 		<altitudeMode>relativeToGround</altitudeMode>
 		<outerBoundaryIs>
@@ -737,6 +927,16 @@
 </Placemark>
 
 <Placemark>
+	<name>Map Polygon 20</name>
+	<Style>
+		<LineStyle>
+			<color>#dd000000</color>
+			<width>0.4</width>
+		</LineStyle>
+		<PolyStyle>
+			<color>#dd0038A8</color>
+		</PolyStyle>
+	</Style>
 	<Polygon>
 		<altitudeMode>relativeToGround</altitudeMode>
 		<outerBoundaryIs>
@@ -768,6 +968,16 @@
 </Placemark>
 
 <Placemark>
+	<name>Map Polygon 21</name>
+	<Style>
+		<LineStyle>
+			<color>#dd000000</color>
+			<width>0.4</width>
+		</LineStyle>
+		<PolyStyle>
+			<color>#dd0038A8</color>
+		</PolyStyle>
+	</Style>
 	<Polygon>
 		<altitudeMode>relativeToGround</altitudeMode>
 		<outerBoundaryIs>
@@ -800,6 +1010,16 @@
 </Placemark>
 
 <Placemark>
+	<name>Map Polygon 22</name>
+	<Style>
+		<LineStyle>
+			<color>#dd000000</color>
+			<width>0.4</width>
+		</LineStyle>
+		<PolyStyle>
+			<color>#dd00AAFF</color>
+		</PolyStyle>
+	</Style>
 	<Polygon>
 		<altitudeMode>relativeToGround</altitudeMode>
 		<outerBoundaryIs>
@@ -861,6 +1081,16 @@
 </Placemark>
 
 <Placemark>
+	<name>Map Polygon 23</name>
+	<Style>
+		<LineStyle>
+			<color>#dd000000</color>
+			<width>0.4</width>
+		</LineStyle>
+		<PolyStyle>
+			<color>#ddA88400</color>
+		</PolyStyle>
+	</Style>
 	<Polygon>
 		<altitudeMode>relativeToGround</altitudeMode>
 		<outerBoundaryIs>
@@ -904,6 +1134,16 @@
 </Placemark>
 
 <Placemark>
+	<name>Map Polygon 24</name>
+	<Style>
+		<LineStyle>
+			<color>#dd000000</color>
+			<width>0.4</width>
+		</LineStyle>
+		<PolyStyle>
+			<color>#dd0055FF</color>
+		</PolyStyle>
+	</Style>
 	<Polygon>
 		<altitudeMode>relativeToGround</altitudeMode>
 		<outerBoundaryIs>
@@ -933,6 +1173,16 @@
 </Placemark>
 
 <Placemark>
+	<name>Map Polygon 25</name>
+	<Style>
+		<LineStyle>
+			<color>#dd000000</color>
+			<width>0.4</width>
+		</LineStyle>
+		<PolyStyle>
+			<color>#dd0055FF</color>
+		</PolyStyle>
+	</Style>
 	<Polygon>
 		<altitudeMode>relativeToGround</altitudeMode>
 		<outerBoundaryIs>
@@ -960,6 +1210,16 @@
 </Placemark>
 
 <Placemark>
+	<name>Map Polygon 26</name>
+	<Style>
+		<LineStyle>
+			<color>#dd000000</color>
+			<width>0.4</width>
+		</LineStyle>
+		<PolyStyle>
+			<color>#dd0038A8</color>
+		</PolyStyle>
+	</Style>
 	<Polygon>
 		<altitudeMode>relativeToGround</altitudeMode>
 		<outerBoundaryIs>
@@ -997,6 +1257,16 @@
 </Placemark>
 
 <Placemark>
+	<name>Map Polygon 27</name>
+	<Style>
+		<LineStyle>
+			<color>#dd000000</color>
+			<width>0.4</width>
+		</LineStyle>
+		<PolyStyle>
+			<color>#dd0038A8</color>
+		</PolyStyle>
+	</Style>
 	<Polygon>
 		<altitudeMode>relativeToGround</altitudeMode>
 		<outerBoundaryIs>
@@ -1045,6 +1315,16 @@
 </Placemark>
 
 <Placemark>
+	<name>Map Polygon 28</name>
+	<Style>
+		<LineStyle>
+			<color>#dd000000</color>
+			<width>0.4</width>
+		</LineStyle>
+		<PolyStyle>
+			<color>#dd0038A8</color>
+		</PolyStyle>
+	</Style>
 	<Polygon>
 		<altitudeMode>relativeToGround</altitudeMode>
 		<outerBoundaryIs>
@@ -1091,6 +1371,16 @@
 </Placemark>
 
 <Placemark>
+	<name>Map Polygon 29</name>
+	<Style>
+		<LineStyle>
+			<color>#dd000000</color>
+			<width>0.4</width>
+		</LineStyle>
+		<PolyStyle>
+			<color>#dd0038A8</color>
+		</PolyStyle>
+	</Style>
 	<Polygon>
 		<altitudeMode>relativeToGround</altitudeMode>
 		<outerBoundaryIs>
@@ -1126,6 +1416,16 @@
 </Placemark>
 
 <Placemark>
+	<name>Map Polygon 30</name>
+	<Style>
+		<LineStyle>
+			<color>#dd000000</color>
+			<width>0.4</width>
+		</LineStyle>
+		<PolyStyle>
+			<color>#dd0038A8</color>
+		</PolyStyle>
+	</Style>
 	<Polygon>
 		<altitudeMode>relativeToGround</altitudeMode>
 		<outerBoundaryIs>
@@ -1182,6 +1482,16 @@
 </Placemark>
 
 <Placemark>
+	<name>Map Polygon 31</name>
+	<Style>
+		<LineStyle>
+			<color>#dd000000</color>
+			<width>0.4</width>
+		</LineStyle>
+		<PolyStyle>
+			<color>#dd0038A8</color>
+		</PolyStyle>
+	</Style>
 	<Polygon>
 		<altitudeMode>relativeToGround</altitudeMode>
 		<outerBoundaryIs>
@@ -1219,6 +1529,16 @@
 </Placemark>
 
 <Placemark>
+	<name>Map Polygon 32</name>
+	<Style>
+		<LineStyle>
+			<color>#dd000000</color>
+			<width>0.4</width>
+		</LineStyle>
+		<PolyStyle>
+			<color>#dd0038A8</color>
+		</PolyStyle>
+	</Style>
 	<Polygon>
 		<altitudeMode>relativeToGround</altitudeMode>
 		<outerBoundaryIs>
@@ -1258,6 +1578,16 @@
 </Placemark>
 
 <Placemark>
+	<name>Map Polygon 33</name>
+	<Style>
+		<LineStyle>
+			<color>#dd000000</color>
+			<width>0.4</width>
+		</LineStyle>
+		<PolyStyle>
+			<color>#dd0038A8</color>
+		</PolyStyle>
+	</Style>
 	<Polygon>
 		<altitudeMode>relativeToGround</altitudeMode>
 		<outerBoundaryIs>
@@ -1291,6 +1621,16 @@
 </Placemark>
 
 <Placemark>
+	<name>Map Polygon 34</name>
+	<Style>
+		<LineStyle>
+			<color>#dd000000</color>
+			<width>0.4</width>
+		</LineStyle>
+		<PolyStyle>
+			<color>#dd0038A8</color>
+		</PolyStyle>
+	</Style>
 	<Polygon>
 		<altitudeMode>relativeToGround</altitudeMode>
 		<outerBoundaryIs>
@@ -1328,6 +1668,16 @@
 </Placemark>
 
 <Placemark>
+	<name>Map Polygon 35</name>
+	<Style>
+		<LineStyle>
+			<color>#dd000000</color>
+			<width>0.4</width>
+		</LineStyle>
+		<PolyStyle>
+			<color>#ddA88400</color>
+		</PolyStyle>
+	</Style>
 	<Polygon>
 		<altitudeMode>relativeToGround</altitudeMode>
 		<outerBoundaryIs>
@@ -1353,6 +1703,16 @@
 </Placemark>
 
 <Placemark>
+	<name>Map Polygon 36</name>
+	<Style>
+		<LineStyle>
+			<color>#dd000000</color>
+			<width>0.4</width>
+		</LineStyle>
+		<PolyStyle>
+			<color>#ddA88400</color>
+		</PolyStyle>
+	</Style>
 	<Polygon>
 		<altitudeMode>relativeToGround</altitudeMode>
 		<outerBoundaryIs>
@@ -1386,6 +1746,16 @@
 </Placemark>
 
 <Placemark>
+	<name>Map Polygon 37</name>
+	<Style>
+		<LineStyle>
+			<color>#dd000000</color>
+			<width>0.4</width>
+		</LineStyle>
+		<PolyStyle>
+			<color>#ddA88400</color>
+		</PolyStyle>
+	</Style>
 	<Polygon>
 		<altitudeMode>relativeToGround</altitudeMode>
 		<outerBoundaryIs>
@@ -1417,6 +1787,16 @@
 </Placemark>
 
 <Placemark>
+	<name>Map Polygon 38</name>
+	<Style>
+		<LineStyle>
+			<color>#dd000000</color>
+			<width>0.4</width>
+		</LineStyle>
+		<PolyStyle>
+			<color>#ddA88400</color>
+		</PolyStyle>
+	</Style>
 	<Polygon>
 		<altitudeMode>relativeToGround</altitudeMode>
 		<outerBoundaryIs>
@@ -1449,6 +1829,16 @@
 </Placemark>
 
 <Placemark>
+	<name>Map Polygon 39</name>
+	<Style>
+		<LineStyle>
+			<color>#dd000000</color>
+			<width>0.4</width>
+		</LineStyle>
+		<PolyStyle>
+			<color>#dd0038A8</color>
+		</PolyStyle>
+	</Style>
 	<Polygon>
 		<altitudeMode>relativeToGround</altitudeMode>
 		<outerBoundaryIs>
@@ -1479,6 +1869,16 @@
 </Placemark>
 
 <Placemark>
+	<name>Map Polygon 40</name>
+	<Style>
+		<LineStyle>
+			<color>#dd000000</color>
+			<width>0.4</width>
+		</LineStyle>
+		<PolyStyle>
+			<color>#dd0038A8</color>
+		</PolyStyle>
+	</Style>
 	<Polygon>
 		<altitudeMode>relativeToGround</altitudeMode>
 		<outerBoundaryIs>
@@ -1518,6 +1918,16 @@
 </Placemark>
 
 <Placemark>
+	<name>Map Polygon 41</name>
+	<Style>
+		<LineStyle>
+			<color>#dd000000</color>
+			<width>0.4</width>
+		</LineStyle>
+		<PolyStyle>
+			<color>#dd0038A8</color>
+		</PolyStyle>
+	</Style>
 	<Polygon>
 		<altitudeMode>relativeToGround</altitudeMode>
 		<outerBoundaryIs>
@@ -1550,6 +1960,16 @@
 </Placemark>
 
 <Placemark>
+	<name>Map Polygon 42</name>
+	<Style>
+		<LineStyle>
+			<color>#dd000000</color>
+			<width>0.4</width>
+		</LineStyle>
+		<PolyStyle>
+			<color>#dd0038A8</color>
+		</PolyStyle>
+	</Style>
 	<Polygon>
 		<altitudeMode>relativeToGround</altitudeMode>
 		<outerBoundaryIs>
@@ -1593,6 +2013,16 @@
 </Placemark>
 
 <Placemark>
+	<name>Map Polygon 43</name>
+	<Style>
+		<LineStyle>
+			<color>#dd000000</color>
+			<width>0.4</width>
+		</LineStyle>
+		<PolyStyle>
+			<color>#ddA88400</color>
+		</PolyStyle>
+	</Style>
 	<Polygon>
 		<altitudeMode>relativeToGround</altitudeMode>
 		<outerBoundaryIs>
@@ -1627,6 +2057,16 @@
 </Placemark>
 
 <Placemark>
+	<name>Map Polygon 44</name>
+	<Style>
+		<LineStyle>
+			<color>#dd000000</color>
+			<width>0.4</width>
+		</LineStyle>
+		<PolyStyle>
+			<color>#ddA88400</color>
+		</PolyStyle>
+	</Style>
 	<Polygon>
 		<altitudeMode>relativeToGround</altitudeMode>
 		<outerBoundaryIs>
@@ -1667,6 +2107,16 @@
 </Placemark>
 
 <Placemark>
+	<name>Map Polygon 45</name>
+	<Style>
+		<LineStyle>
+			<color>#dd000000</color>
+			<width>0.4</width>
+		</LineStyle>
+		<PolyStyle>
+			<color>#ddA88400</color>
+		</PolyStyle>
+	</Style>
 	<Polygon>
 		<altitudeMode>relativeToGround</altitudeMode>
 		<outerBoundaryIs>
@@ -1719,6 +2169,16 @@
 </Placemark>
 
 <Placemark>
+	<name>Map Polygon 46</name>
+	<Style>
+		<LineStyle>
+			<color>#dd000000</color>
+			<width>0.4</width>
+		</LineStyle>
+		<PolyStyle>
+			<color>#ddA88400</color>
+		</PolyStyle>
+	</Style>
 	<Polygon>
 		<altitudeMode>relativeToGround</altitudeMode>
 		<outerBoundaryIs>
@@ -1769,6 +2229,16 @@
 </Placemark>
 
 <Placemark>
+	<name>Map Polygon 47</name>
+	<Style>
+		<LineStyle>
+			<color>#dd000000</color>
+			<width>0.4</width>
+		</LineStyle>
+		<PolyStyle>
+			<color>#ddA88400</color>
+		</PolyStyle>
+	</Style>
 	<Polygon>
 		<altitudeMode>relativeToGround</altitudeMode>
 		<outerBoundaryIs>
@@ -1815,6 +2285,16 @@
 </Placemark>
 
 <Placemark>
+	<name>Map Polygon 48</name>
+	<Style>
+		<LineStyle>
+			<color>#dd000000</color>
+			<width>0.4</width>
+		</LineStyle>
+		<PolyStyle>
+			<color>#ddA88400</color>
+		</PolyStyle>
+	</Style>
 	<Polygon>
 		<altitudeMode>relativeToGround</altitudeMode>
 		<outerBoundaryIs>
@@ -1867,6 +2347,16 @@
 </Placemark>
 
 <Placemark>
+	<name>Map Polygon 49</name>
+	<Style>
+		<LineStyle>
+			<color>#dd000000</color>
+			<width>0.4</width>
+		</LineStyle>
+		<PolyStyle>
+			<color>#ddA88400</color>
+		</PolyStyle>
+	</Style>
 	<Polygon>
 		<altitudeMode>relativeToGround</altitudeMode>
 		<outerBoundaryIs>
@@ -1919,6 +2409,16 @@
 </Placemark>
 
 <Placemark>
+	<name>Map Polygon 50</name>
+	<Style>
+		<LineStyle>
+			<color>#dd000000</color>
+			<width>0.4</width>
+		</LineStyle>
+		<PolyStyle>
+			<color>#ddA88400</color>
+		</PolyStyle>
+	</Style>
 	<Polygon>
 		<altitudeMode>relativeToGround</altitudeMode>
 		<outerBoundaryIs>
@@ -1973,6 +2473,16 @@
 </Placemark>
 
 <Placemark>
+	<name>Map Polygon 51</name>
+	<Style>
+		<LineStyle>
+			<color>#dd000000</color>
+			<width>0.4</width>
+		</LineStyle>
+		<PolyStyle>
+			<color>#ddA88400</color>
+		</PolyStyle>
+	</Style>
 	<Polygon>
 		<altitudeMode>relativeToGround</altitudeMode>
 		<outerBoundaryIs>
@@ -2025,6 +2535,16 @@
 </Placemark>
 
 <Placemark>
+	<name>Map Polygon 52</name>
+	<Style>
+		<LineStyle>
+			<color>#dd000000</color>
+			<width>0.4</width>
+		</LineStyle>
+		<PolyStyle>
+			<color>#ddA88400</color>
+		</PolyStyle>
+	</Style>
 	<Polygon>
 		<altitudeMode>relativeToGround</altitudeMode>
 		<outerBoundaryIs>
@@ -2079,6 +2599,19 @@
 </Placemark>
 
 <Placemark>
+	<name>Stefan</name>
+	<description>Size in squared meter: 100.0
+This camp contains explicit content
+This camp is noisy</description>
+	<Style>
+		<LineStyle>
+			<color>#ff000000</color>
+			<width>0.25</width>
+		</LineStyle>
+		<PolyStyle>
+			<color>#ffFFFFFF</color>
+		</PolyStyle>
+	</Style>
 	<Polygon>
 		<altitudeMode>relativeToGround</altitudeMode>
 		<outerBoundaryIs>
@@ -2097,6 +2630,19 @@
 </Placemark>
 
 <Placemark>
+	<name>Nico</name>
+	<description>Size in squared meter: 100.0
+This camp contains explicit content
+This camp is noisy</description>
+	<Style>
+		<LineStyle>
+			<color>#ff000000</color>
+			<width>0.25</width>
+		</LineStyle>
+		<PolyStyle>
+			<color>#ff9999FF</color>
+		</PolyStyle>
+	</Style>
 	<Polygon>
 		<altitudeMode>relativeToGround</altitudeMode>
 		<outerBoundaryIs>
@@ -2115,17 +2661,30 @@
 </Placemark>
 
 <Placemark>
+	<name>Francois Lombard</name>
+	<description>Size in squared meter: 400.0
+This camp is family safe
+This camp is not noisy</description>
+	<Style>
+		<LineStyle>
+			<color>#ff000000</color>
+			<width>0.25</width>
+		</LineStyle>
+		<PolyStyle>
+			<color>#ff336633</color>
+		</PolyStyle>
+	</Style>
 	<Polygon>
 		<altitudeMode>relativeToGround</altitudeMode>
 		<outerBoundaryIs>
 			<LinearRing>
 				<coordinates>
-					19.74835858154162,-32.32514265276071,0 
-					19.74845560093344,-32.32515429508773,0 
-					19.74851381256853,-32.32466919812863,0 
-					19.748319773784893,-32.32464591347459,0 
-					19.7482615621498,-32.32513101043369,0 
-					19.74835858154162,-32.32514265276071,0 
+					19.746826634143314,-32.325219406919935,0 
+					19.746922967475868,-32.325203030253405,0 
+					19.7468902141428,-32.3250103635883,0 
+					19.746697547477694,-32.325043116921364,0 
+					19.746730300810764,-32.32523578358647,0 
+					19.746826634143314,-32.325219406919935,0 
 				</coordinates>
 			</LinearRing>
 		</outerBoundaryIs>
@@ -2133,17 +2692,30 @@
 </Placemark>
 
 <Placemark>
+	<name>Roger</name>
+	<description>Size in squared meter: 400.0
+This camp contains explicit content
+This camp is not noisy</description>
+	<Style>
+		<LineStyle>
+			<color>#ff000000</color>
+			<width>0.25</width>
+		</LineStyle>
+		<PolyStyle>
+			<color>#ffB3B3B3</color>
+		</PolyStyle>
+	</Style>
 	<Polygon>
 		<altitudeMode>relativeToGround</altitudeMode>
 		<outerBoundaryIs>
 			<LinearRing>
 				<coordinates>
-					19.74783291634134,-32.32511985193753,0 
-					19.747979489493304,-32.32511985193753,0 
-					19.747979489493304,-32.32495699287979,0 
-					19.747686343189375,-32.32495699287979,0 
-					19.747686343189375,-32.32511985193753,0 
-					19.74783291634134,-32.32511985193753,0 
+					19.74765274519591,-32.325129948527,0 
+					19.747798960557994,-32.325119713451656,0 
+					19.747789862713244,-32.324989744240916,0 
+					19.747497431989075,-32.325010214391604,0 
+					19.747506529833828,-32.32514018360235,0 
+					19.74765274519591,-32.325129948527,0 
 				</coordinates>
 			</LinearRing>
 		</outerBoundaryIs>
