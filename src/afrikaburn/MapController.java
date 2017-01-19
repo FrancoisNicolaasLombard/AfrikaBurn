@@ -42,12 +42,12 @@ public final class MapController {
     private final Polygon[] mapPolygons;// High Resolution Polygons
     private final ArrayList<Booking> bookings;// All of the Clients
     private final double[] yMin;    // Smallest Y-Value of map
-    private double[] yMax;    // Largest Y-Value of map
+    private final double[] yMax;    // Largest Y-Value of map
     private final double[] xMin;    // Smallest X-Value of map
-    private double[] xMax;    // Largest X-Value of map
+    private final double[] xMax;    // Largest X-Value of map
     private final Label infoLabel;
-    private final Pane map;
-    private boolean editing = false;
+    private final Pane pane_Map;
+    private boolean isEditing = false;
     private final VBox clientList;
     private final File csvData;
 
@@ -58,7 +58,7 @@ public final class MapController {
     MapController(Label infoLabel, Pane map, ArrayList<Booking> bookings, VBox clientList, File jsonData, File csvData) {
         this.bookings = bookings;
         this.infoLabel = infoLabel;
-        this.map = map;
+        this.pane_Map = map;
         this.clientList = clientList;
         this.csvData = csvData;
 
@@ -67,6 +67,7 @@ public final class MapController {
         xMin = new double[2];
         xMax = new double[2];
 
+        // Gets Map
         JSONReader reader = new JSONReader(jsonData);
         mapPolygons = reader.polygons();
         minMax();
@@ -85,6 +86,7 @@ public final class MapController {
             }
         }
 
+        // Get the layout of the normalised map
         yMin[1] = yMin[0] / BIGGEST_EDGE * (map.getWidth() > map.getHeight() ? map.getWidth() : map.getHeight());
         yMax[1] = yMax[0] / BIGGEST_EDGE * (map.getWidth() > map.getHeight() ? map.getWidth() : map.getHeight());
         xMin[1] = xMin[0] / BIGGEST_EDGE * (map.getWidth() > map.getHeight() ? map.getWidth() : map.getHeight());
@@ -94,26 +96,29 @@ public final class MapController {
         resetMap();
     }
 
+    /**
+     * Resets the map to the starting position - after exported to PNG
+     */
     public void resetMap() {
         Scale scale = new Scale();
         scale.setPivotX((GV.SCREEN_W / 5 + GV.SCREEN_W * 2 / 5));
         scale.setPivotY((GV.SCREEN_H * 0.9) / 2);
         scale.setX(1 / GV.ZOOM_AMOUNT / 5);
         scale.setY(1 / GV.ZOOM_AMOUNT / 5);
-        map.getTransforms().add(scale);
+        pane_Map.getTransforms().add(scale);
         dragMap(-1500, -1200);
     }
 
     /**
      * @return @Author FN Lombard
      * @Company: VASTech
-     * @Description: This method builds the map and returns it to the controller
+     * @Description: Adds all of the polygons to the pane
      */
-    public void setupMap() {
+    private void setupMap() {
         for (Polygon current : mapPolygons) {
             current.setStroke(Color.BLACK);
             setMapListeners(current);
-            map.getChildren().add(current);
+            pane_Map.getChildren().add(current);
         }
 
         bookings.stream().map((current) -> {
@@ -125,22 +130,26 @@ public final class MapController {
             current.isPlaced(false);
             for (Polygon island : mapPolygons) {
                 if (island.contains(center[0], center[1])) {
-                    map.getChildren().addAll(current.getArea(), current.getText());
+                    pane_Map.getChildren().addAll(current.getArea(), current.getText());
                     current.isPlaced(true);
                 }
             }
         });
 
-        // The origin is in the top left hand corner, changes it to bottom left
-        map.setOnDragExited(e -> {
-            editing = false;
+        // Makes shapes slightly invisible when dragging
+        pane_Map.setOnDragExited(e -> {
+            isEditing = false;
             bookings.get(Integer.parseInt(e.getDragboard().getString().split(",")[0])).getArea().setOpacity(1);
             e.consume();
         });
 
-        map.getTransforms().add(new Rotate(0, map.getWidth() / 2, map.getHeight() / 2));
+        pane_Map.getTransforms().add(new Rotate(0, pane_Map.getWidth() / 2, pane_Map.getHeight() / 2));
     }
 
+    /**
+     * When a client is added, the shapes get listeners assigned to it
+     * @param booking 
+     */
     public void addBooking(Booking booking) {
         setClientListeners(booking.getArea());
         setClientListeners(booking.getText());
@@ -194,10 +203,10 @@ public final class MapController {
                 Text label = bookings.get(Integer.parseInt(e.getDragboard().getString().split(",")[0])).getText();
                 booking.setVisible(true);
 
-                if (!map.getChildren().contains(booking)) {
+                if (!pane_Map.getChildren().contains(booking)) {
                     booking.getTransforms().addAll(mapPolygons[0].getTransforms());
                     label.getTransforms().addAll(mapPolygons[0].getTransforms());
-                    map.getChildren().addAll(booking, label);
+                    pane_Map.getChildren().addAll(booking, label);
                     ((Text) clientList.getChildren().get(bookings.get(Integer.parseInt(e.getDragboard().getString().split(",")[0])).getId())).setFill(Color.web("#6E6E6E"));
                     bookings.get(Integer.parseInt(e.getDragboard().getString().split(",")[0])).isPlaced(true);
                     infoLabel.setText("Client Booking in Progress.");
@@ -206,10 +215,14 @@ public final class MapController {
         });
     }
 
-    // && bookings.get(Integer.parseInt(e.getDragboard().getString().split(",")[0])).getText() == textCurrent
+    /**
+     * The method takes the polygons and texts from the clients and assigns listeners to them
+     * @param clientCurrent 
+     */
     private void setClientListeners(Shape clientCurrent) {
         clientCurrent.setOnMouseClicked(e -> {
             infoLabel.setText("Click and hold to drag this polygon around, drag off to the client list to remove it.");
+            e.consume();
         });
 
         clientCurrent.setOnDragDropped(e -> {
@@ -295,19 +308,27 @@ public final class MapController {
         for (Polygon mapPolygon : mapPolygons) {
             ObservableList<Double> tmpPolygon = mapPolygon.getPoints();
             for (int coords = 0; coords < tmpPolygon.size(); coords += 2) {
-                tmpPolygon.set(coords, (tmpPolygon.get(coords) - xMin[0]) / BIGGEST_EDGE * (map.getWidth() > map.getHeight() ? map.getWidth() : map.getHeight()));
-                tmpPolygon.set(coords + 1, (tmpPolygon.get(coords + 1) - yMin[0]) / BIGGEST_EDGE * (map.getWidth() > map.getHeight() ? map.getWidth() : map.getHeight()));
+                tmpPolygon.set(coords, (tmpPolygon.get(coords) - xMin[0]) / BIGGEST_EDGE * (pane_Map.getWidth() > pane_Map.getHeight() ? pane_Map.getWidth() : pane_Map.getHeight()));
+                tmpPolygon.set(coords + 1, (tmpPolygon.get(coords + 1) - yMin[0]) / BIGGEST_EDGE * (pane_Map.getWidth() > pane_Map.getHeight() ? pane_Map.getWidth() : pane_Map.getHeight()));
             }
         }
 
         bookings.stream().map((booking) -> booking.getArea().getPoints()).forEachOrdered((tmpPolygon) -> {
             for (int coords = 0; coords < tmpPolygon.size(); coords += 2) {
-                tmpPolygon.set(coords, (tmpPolygon.get(coords) - xMin[0]) / BIGGEST_EDGE * (map.getWidth() > map.getHeight() ? map.getWidth() : map.getHeight()));
-                tmpPolygon.set(coords + 1, (tmpPolygon.get(coords + 1) - yMin[0]) / BIGGEST_EDGE * (map.getWidth() > map.getHeight() ? map.getWidth() : map.getHeight()));
+                tmpPolygon.set(coords, (tmpPolygon.get(coords) - xMin[0]) / BIGGEST_EDGE * pane_Map.getWidth());
+                tmpPolygon.set(coords + 1, (tmpPolygon.get(coords + 1) - yMin[0]) / BIGGEST_EDGE * pane_Map.getWidth());
             }
+        });
+
+        bookings.forEach((booking) -> {
+            booking.getText().setX((booking.getText().getX() - xMin[0]) / BIGGEST_EDGE * pane_Map.getWidth() - booking.getText().getLayoutBounds().getWidth() / 2.0);
+            booking.getText().setY((booking.getText().getY() - yMin[0]) / BIGGEST_EDGE * pane_Map.getWidth());
         });
     }
 
+    /**
+     * Takes map back to the GPS coordinates
+     */
     public void portMapFrom() {
         //Find the smallest edge of map
         final double DEL_Y = Math.abs(yMax[0] - yMin[0]);
@@ -318,28 +339,33 @@ public final class MapController {
         for (Polygon mapPolygon : mapPolygons) {
             ObservableList<Double> tmpPolygon = mapPolygon.getPoints();
             for (int coords = 0; coords < tmpPolygon.size(); coords += 2) {
-                tmpPolygon.set(coords, tmpPolygon.get(coords) / map.getWidth() * BIGGEST_EDGE + xMin[0]);
-                tmpPolygon.set(coords + 1, tmpPolygon.get(coords + 1) / map.getWidth() * BIGGEST_EDGE + yMin[0]);
+                tmpPolygon.set(coords, tmpPolygon.get(coords) / pane_Map.getWidth() * BIGGEST_EDGE + xMin[0]);
+                tmpPolygon.set(coords + 1, tmpPolygon.get(coords + 1) / pane_Map.getWidth() * BIGGEST_EDGE + yMin[0]);
             }
         }
 
         // Normalise the mapPolygons
         bookings.stream().map((booking) -> booking.getArea().getPoints()).forEachOrdered((tmpPolygon) -> {
             for (int coords = 0; coords < tmpPolygon.size(); coords += 2) {
-                tmpPolygon.set(coords, tmpPolygon.get(coords) / map.getWidth() * BIGGEST_EDGE + xMin[0]);
-                tmpPolygon.set(coords + 1, tmpPolygon.get(coords + 1) / map.getWidth() * BIGGEST_EDGE + yMin[0]);
+                tmpPolygon.set(coords, tmpPolygon.get(coords) / pane_Map.getWidth() * BIGGEST_EDGE + xMin[0]);
+                tmpPolygon.set(coords + 1, tmpPolygon.get(coords + 1) / pane_Map.getWidth() * BIGGEST_EDGE + yMin[0]);
             }
+        });
+
+        bookings.forEach((booking) -> {
+            booking.getText().setX((booking.getText().getX() + booking.getText().getLayoutBounds().getWidth() / 2.0) / pane_Map.getWidth() * BIGGEST_EDGE + xMin[0]);
+            booking.getText().setY(booking.getText().getY() / pane_Map.getWidth() * BIGGEST_EDGE + yMin[0]);
         });
     }
 
     /**
-     *
+     * Function drags the polygons on the 5100x5100 grid
      * @param deltaX
      * @param deltaY
      */
     public void dragMap(double deltaX, double deltaY) {
-        if (!editing) {
-            map.getChildren().forEach((component) -> {
+        if (!isEditing) {
+            pane_Map.getChildren().forEach((component) -> {
                 component.getTransforms().add(new Translate(deltaX, deltaY));
             });
         }
@@ -352,7 +378,7 @@ public final class MapController {
      */
     public void zoomIn(ScrollEvent m) {
         double oldScale = 1;
-        oldScale = map.getTransforms().stream()
+        oldScale = pane_Map.getTransforms().stream()
                 .filter((x) -> (x instanceof Scale))
                 .map((x) -> x.getMxx())
                 .reduce(oldScale, (accumulator, _item) -> accumulator * _item);
@@ -363,12 +389,12 @@ public final class MapController {
         scale.setX(GV.ZOOM_AMOUNT * oldScale);
         scale.setY(GV.ZOOM_AMOUNT * oldScale);
 
-        for (int i = map.getTransforms().size() - 1; i >= 0; i--) {
-            if (map.getTransforms().get(i) instanceof Scale) {
-                map.getTransforms().remove(map.getTransforms().get(i));
+        for (int i = pane_Map.getTransforms().size() - 1; i >= 0; i--) {
+            if (pane_Map.getTransforms().get(i) instanceof Scale) {
+                pane_Map.getTransforms().remove(pane_Map.getTransforms().get(i));
             }
         }
-        map.getTransforms().add(scale);
+        pane_Map.getTransforms().add(scale);
     }
 
     /**
@@ -378,7 +404,7 @@ public final class MapController {
      */
     public void zoomOut(ScrollEvent m) {
         double oldScale = 1;
-        oldScale = map.getTransforms().stream()
+        oldScale = pane_Map.getTransforms().stream()
                 .filter((x) -> (x instanceof Scale))
                 .map((x) -> x.getMxx())
                 .reduce(oldScale, (accumulator, _item) -> accumulator * _item);
@@ -389,12 +415,12 @@ public final class MapController {
         scale.setX(oldScale / GV.ZOOM_AMOUNT);
         scale.setY(oldScale / GV.ZOOM_AMOUNT);
 
-        for (int i = map.getTransforms().size() - 1; i >= 0; i--) {
-            if (map.getTransforms().get(i) instanceof Scale) {
-                map.getTransforms().remove(map.getTransforms().get(i));
+        for (int i = pane_Map.getTransforms().size() - 1; i >= 0; i--) {
+            if (pane_Map.getTransforms().get(i) instanceof Scale) {
+                pane_Map.getTransforms().remove(pane_Map.getTransforms().get(i));
             }
         }
-        map.getTransforms().add(scale);
+        pane_Map.getTransforms().add(scale);
     }
 
     /**
@@ -432,7 +458,6 @@ public final class MapController {
         // Declare two points and use the first two as default
         double[] line_closest = new double[4];
         double x1, y1, x2, y2;
-        double polygonIndex = 0;
 
         // Connect the last point to the first one
         x1 = plane.getPoints().get(plane.getPoints().size() - 2);
@@ -465,7 +490,6 @@ public final class MapController {
                     line_closest[2] = x2;
                     line_closest[3] = y2;
 
-                    polygonIndex = i;
                     shortest = temp_distance;
                 }
             }
@@ -516,17 +540,6 @@ public final class MapController {
             // First Point
             next_x = prev_x + faceLength / 2.0 / GV.METER_2_MAP_RATIO * cos(atan(gradient));
             next_y = prev_y + faceLength / 2.0 / GV.METER_2_MAP_RATIO * sin(atan(gradient));
-            /* if (plane.contains(next_x, next_y)) {
-                test.getPoints().addAll(next_x, next_y);
-            } else {
-                double drawnLength = 0;
-                double lengthToDraw = length(prev_x, prev_y, next_x, next_y);
-                while (drawnLength < lengthToDraw) {
-                    if (){
-                        
-                    }
-                }
-            }*/
             test.getPoints().addAll(next_x, next_y);
 
             // Second Point
@@ -585,6 +598,9 @@ public final class MapController {
         return new double[]{(shape.getLayoutBounds().getMaxX() + shape.getLayoutBounds().getMinX()) / 2.0, (shape.getLayoutBounds().getMaxY() + shape.getLayoutBounds().getMinY()) / 2.0};
     }
 
+    /**
+     * This method saves the current state of the program to the csv file
+     */
     public void updateFile() {
         BufferedWriter writer = null;
         try {

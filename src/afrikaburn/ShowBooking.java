@@ -1,7 +1,7 @@
 package afrikaburn;
 
 /**
- *
+ * Child of booking: adds a front area
  * @author User
  */
 public class ShowBooking extends Booking {

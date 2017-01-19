@@ -15,7 +15,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Polygon;
 
 /**
- *
+ * This class parses the shapes into a KML file
  * @author User
  */
 public class KMLWriter {
@@ -59,7 +59,7 @@ public class KMLWriter {
                         + "\t\t</PolyStyle>\r\n"
                         + "\t</Style>\r\n"
                         + "\t<Polygon>\r\n"
-                        + "\t\t<altitudeMode>relativeToGround</altitudeMode>\r\n"
+                        + "\t\t<altitudeMode>clampToGround</altitudeMode>\r\n"
                         + "\t\t<outerBoundaryIs>\r\n"
                         + "\t\t\t<LinearRing>\r\n"
                         + "\t\t\t\t<coordinates>\r\n"
@@ -104,7 +104,7 @@ public class KMLWriter {
                         + "\t\t</PolyStyle>\r\n"
                         + "\t</Style>\r\n"
                         + "\t<Polygon>\r\n"
-                        + "\t\t<altitudeMode>relativeToGround</altitudeMode>\r\n"
+                        + "\t\t<altitudeMode>clampToGround</altitudeMode>\r\n"
                         + "\t\t<outerBoundaryIs>\r\n"
                         + "\t\t\t<LinearRing>\r\n"
                         + "\t\t\t\t<coordinates>\r\n"
@@ -113,6 +113,22 @@ public class KMLWriter {
                         + "\t\t\t</LinearRing>\r\n"
                         + "\t\t</outerBoundaryIs>\r\n"
                         + "\t</Polygon>\r\n"
+                        + "</Placemark>\r\n\r\n");
+
+                fw.write("<Placemark>\r\n"
+                        + "\t<name>" + booking.getName() + "</name>\r\n"
+                        + "\t<Style>\r\n"
+                        + "\t\t<LabelStyle>\r\n"
+                        + "\t\t\t<scale>0.85</scale>\r\n"
+                        + "\t\t\t<color>#ffffffff</color>\r\n"
+                        + "\t\t</LabelStyle>\r\n"
+                        + "\t\t<IconStyle>\r\n"
+                        + "\t\t\t<Icon></Icon>\r\n"
+                        + "\t\t</IconStyle>\r\n"
+                        + "\t</Style>\r\n"
+                        + "\t<Point>\r\n"
+                        + "\t\t<coordinates>" + booking.getText().getX() + "," + -1.0 * booking.getText().getY() + "</coordinates>\r\n"
+                        + "\t</Point>"
                         + "</Placemark>\r\n\r\n");
             }
 

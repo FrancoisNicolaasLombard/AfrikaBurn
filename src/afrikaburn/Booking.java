@@ -12,7 +12,9 @@ import javafx.scene.text.TextAlignment;
  *
  * @Author: FN Lombard
  * @Company: VASTech
- * @Description
+ * @Description: This is the parent to any type of booking that can be made
+ * @TODO: Can make a child that (for example) can have a different kind of 
+ * polygon algorithm.
  */
 public class Booking {
 

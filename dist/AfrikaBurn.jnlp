@@ -8,7 +8,7 @@
   </information>
   <resources>
     <j2se version="1.6+" java-vm-args="-Xmx6g "  href="http://java.sun.com/products/autodl/j2se"/>
-    <jar href="AfrikaBurn.jar" size="164706" download="eager" />
+    <jar href="AfrikaBurn.jar" size="165504" download="eager" />
     <jar href="lib\com.fasterxml.jackson.core.jar" size="206234" download="eager" />
     <jar href="lib\com.fasterxml.jackson.databind.jar" size="920971" download="eager" />
     <jar href="lib\commons-io-2.5-javadoc.jar" size="765022" download="eager" />

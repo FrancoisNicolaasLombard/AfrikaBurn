@@ -14,6 +14,10 @@ import java.util.logging.Logger;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Polygon;
 
+/**
+ * This class just parses the shapes into a JSON file
+ * @author User
+ */
 public class JSONWriter {
 
     public JSONWriter(Polygon[] mapPolygons, ArrayList<Booking> bookings) {
