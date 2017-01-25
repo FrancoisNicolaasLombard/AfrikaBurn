@@ -532,9 +532,9 @@ public class Controller implements Initializable {
         });
 
         // Initiates labels
-        lblExportMapPng = new Label("Exports the map to four 9900x6419 PNG files - required 7.5 GB of RAM.");
-        lblExportMapKML = new Label("Exports the map to a KML file - can load into Google Maps/Earth.");
-        lblExportMapJSON = new Label("Exports the map to a JSON file - can load into GeoJSON/MapShaper to change format.");
+        lblExportMapPng = new Label("Exports the map to four 9900x6419 PNG files\n - required 7.5 GB of RAM.");
+        lblExportMapKML = new Label("Exports the map to a KML file\n - can load into Google Maps/Earth.");
+        lblExportMapJSON = new Label("Exports the map to a JSON file\n - can load into GeoJSON/MapShaper to change format.");
         lblExportMapGPX = new Label("Exports the map to a GPX file that Garmin can Read.");
         lblChooseMap = new Label("Choose a GeoJSON file to load the map.");
         lblChooseCSV = new Label("Choose a CSV file in the format: \nbookingType, "
@@ -542,9 +542,10 @@ public class Controller implements Initializable {
                 + "Front(m), "
                 + "Area(m\u00B2), "
                 + "isNoisy, "
-                + "isExplicit, "
+                + "isExplicit, \n"
                 + "PolygonPoints [x;y x;y..] ([-1.0;-1.0] for default), "
-                + "Colour in hex");
+                + "Colour in hex, "
+                + "Two frontage coords.");
 
         // Assign layout to labels
         lblExportMapPng.setLayoutX(240);

@@ -4,133 +4,109 @@
 		<name><![CDATA[AfrikaBurn Map]]></name>
 	</metadata>
 
-<wpt lat="-32.32462040564876" lon="19.747930489639415">
+<wpt lat="-32.32599193769691" lon="19.751760191221155">
 	<ele>0</ele>
 	<name><![CDATA[Stefan]]></name>
 	<cmt><![CDATA[Side One]]></cmt>
 </wpt>
 
-<wpt lat="-32.32461503321347" lon="19.74783295439277">
+<wpt lat="-32.32590030516917" lon="19.75172625324792">
 	<ele>0</ele>
 	<name><![CDATA[Stefan]]></name>
 	<cmt><![CDATA[Side Two]]></cmt>
 </wpt>
 
-<wpt lat="-32.324615007637924" lon="19.747832419066732">
+<wpt lat="-32.325708978884904" lon="19.751028193539042">
 	<ele>0</ele>
 	<name><![CDATA[Nico]]></name>
 	<cmt><![CDATA[Side One]]></cmt>
 </wpt>
 
-<wpt lat="-32.32461617839895" lon="19.74773484702333">
+<wpt lat="-32.32563454353051" lon="19.75096497058057">
 	<ele>0</ele>
 	<name><![CDATA[Nico]]></name>
 	<cmt><![CDATA[Side Two]]></cmt>
 </wpt>
 
-<wpt lat="-32.325980210707286" lon="19.750363597022815">
+<wpt lat="-32.32590248322201" lon="19.751727059934108">
 	<ele>0</ele>
 	<name><![CDATA[Francois Lombard]]></name>
 	<cmt><![CDATA[Side One]]></cmt>
 </wpt>
 
-<wpt lat="-32.32584254359404" lon="19.75022537643399">
+<wpt lat="-32.32572103655149" lon="19.75165458662839">
 	<ele>0</ele>
 	<name><![CDATA[Francois Lombard]]></name>
 	<cmt><![CDATA[Side Two]]></cmt>
 </wpt>
 
-<wpt lat="-32.32463355573789" lon="19.748322141818942">
+<wpt lat="-32.32549285556469" lon="19.751504867819673">
 	<ele>0</ele>
 	<name><![CDATA[Roger]]></name>
 	<cmt><![CDATA[Side One]]></cmt>
 </wpt>
 
-<wpt lat="-32.32462074988599" lon="19.747931600913027">
+<wpt lat="-32.32543027650207" lon="19.751119134984854">
 	<ele>0</ele>
 	<name><![CDATA[Roger]]></name>
 	<cmt><![CDATA[Side Two]]></cmt>
 </wpt>
 
-<wpt lat="-32.32514636906819" lon="19.748389550770668">
-	<ele>0</ele>
-	<name><![CDATA[Test 25m^2]]></name>
-	<cmt><![CDATA[Side One]]></cmt>
-</wpt>
-
-<wpt lat="-32.32514054790469" lon="19.74834104107476">
-	<ele>0</ele>
-	<name><![CDATA[Test 25m^2]]></name>
-	<cmt><![CDATA[Side Two]]></cmt>
-</wpt>
-
-<wpt lat="-32.32514027832395" lon="19.74833879456862">
-	<ele>0</ele>
-	<name><![CDATA[Test 50m^2]]></name>
-	<cmt><![CDATA[Side One]]></cmt>
-</wpt>
-
-<wpt lat="-32.32513445716044" lon="19.748290284872713">
-	<ele>0</ele>
-	<name><![CDATA[Test 50m^2]]></name>
-	<cmt><![CDATA[Side Two]]></cmt>
-</wpt>
-
-<wpt lat="-32.32514115125322" lon="19.74751260520112">
+<wpt lat="-32.32572099784563" lon="19.75165448038584">
 	<ele>0</ele>
 	<name><![CDATA[Dieter]]></name>
 	<cmt><![CDATA[Side One]]></cmt>
 </wpt>
 
-<wpt lat="-32.325169544972184" lon="19.747221073868875">
+<wpt lat="-32.32549252097463" lon="19.751503802139734">
 	<ele>0</ele>
 	<name><![CDATA[Dieter]]></name>
 	<cmt><![CDATA[Side Two]]></cmt>
 </wpt>
 
-<wpt lat="-32.32506422510563" lon="19.74719940350739">
+<wpt lat="-32.32543007718201" lon="19.751116044766615">
 	<ele>0</ele>
 	<name><![CDATA[Kristiaan]]></name>
 	<cmt><![CDATA[Side One]]></cmt>
 </wpt>
 
-<wpt lat="-32.324765150290524" lon="19.747171588836604">
+<wpt lat="-32.32537010686788" lon="19.750779422916306">
 	<ele>0</ele>
 	<name><![CDATA[Kristiaan]]></name>
 	<cmt><![CDATA[Side Two]]></cmt>
 </wpt>
 
-<wpt lat="-32.32511985193753" lon="19.74790494922834">
+<wpt lat="-32.32630695421909" lon="19.75141439711512">
 	<ele>0</ele>
 	<name><![CDATA[Pieter]]></name>
 	<cmt><![CDATA[Side One]]></cmt>
 </wpt>
 
-<wpt lat="-32.3251413938953" lon="19.747514937702505">
+<wpt lat="-32.326047215597434" lon="19.75121320346747">
 	<ele>0</ele>
 	<name><![CDATA[Pieter]]></name>
 	<cmt><![CDATA[Side Two]]></cmt>
 </wpt>
 
-<wpt lat="-32.32461658387917" lon="19.747734227862324">
+<wpt lat="-32.32599115062691" lon="19.751759899713793">
 	<ele>0</ele>
 	<name><![CDATA[Test Long Front]]></name>
 	<cmt><![CDATA[Side One]]></cmt>
 </wpt>
 
-<wpt lat="-32.3247643855391" lon="19.747171121254222">
+<wpt lat="-32.32630733630617" lon="19.751413338479328">
 	<ele>0</ele>
 	<name><![CDATA[Test Long Front]]></name>
 	<cmt><![CDATA[Side Two]]></cmt>
 </wpt>
 
-<wpt lat="-32.3251341582907" lon="19.748288984022295">
+<wpt lat="-32.326047862423806" lon="19.75121345130092">
 	<ele>0</ele>
 	<name><![CDATA[Karlien]]></name>
 	<cmt><![CDATA[Side One]]></cmt>
 </wpt>
 
-<wpt lat="-32.32511985193753" lon="19.747898652578602">
+<wpt lat="-32.32570762680565" lon="19.751027066806405">
 	<ele>0</ele>
 	<name><![CDATA[Karlien]]></name>
 	<cmt><![CDATA[Side Two]]></cmt>

@@ -14,7 +14,11 @@ import java.util.logging.Logger;
 
 /**
  *
- * @author franc
+ * @author: FN Lombard
+ * @Company: VASTech
+ *
+ * @Description: The class writes the layout to a gpx file which can be used in 
+ * Garmin BaseCamp
  */
 public class GPXWriter {
 
