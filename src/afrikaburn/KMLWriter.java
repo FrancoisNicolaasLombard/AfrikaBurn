@@ -16,6 +16,7 @@ import javafx.scene.shape.Polygon;
 
 /**
  * This class parses the shapes into a KML file
+ *
  * @author User
  */
 public class KMLWriter {
@@ -72,64 +73,66 @@ public class KMLWriter {
             }
 
             for (Booking booking : bookings) {
-                Color fill = (Color) booking.getArea().getFill();
-                String fill_hex = String.format("#ff%02X%02X%02X",
-                        (int) (fill.getBlue() * 255),
-                        (int) (fill.getGreen() * 255),
-                        (int) (fill.getRed() * 255));
+                if (booking.isPlaced()) {
+                    Color fill = (Color) booking.getArea().getFill();
+                    String fill_hex = String.format("#ff%02X%02X%02X",
+                            (int) (fill.getBlue() * 255),
+                            (int) (fill.getGreen() * 255),
+                            (int) (fill.getRed() * 255));
 
-                Color stroke = (Color) booking.getArea().getStroke();
-                String stroke_hex = String.format("#ff%02X%02X%02X",
-                        (int) (stroke.getBlue() * 255),
-                        (int) (stroke.getGreen() * 255),
-                        (int) (stroke.getRed() * 255));
+                    Color stroke = (Color) booking.getArea().getStroke();
+                    String stroke_hex = String.format("#ff%02X%02X%02X",
+                            (int) (stroke.getBlue() * 255),
+                            (int) (stroke.getGreen() * 255),
+                            (int) (stroke.getRed() * 255));
 
-                String tmpBuild = "";
-                for (int i = 0; i < booking.getArea().getPoints().size(); i += 2) {
-                    tmpBuild += "\t\t\t\t\t" + booking.getArea().getPoints().get(i) + "," + -1.0 * booking.getArea().getPoints().get(i + 1) + ",0 \r\n";
+                    String tmpBuild = "";
+                    for (int i = 0; i < booking.getArea().getPoints().size(); i += 2) {
+                        tmpBuild += "\t\t\t\t\t" + booking.getArea().getPoints().get(i) + "," + -1.0 * booking.getArea().getPoints().get(i + 1) + ",0 \r\n";
+                    }
+
+                    fw.write("<Placemark>\r\n"
+                            + "\t<name>" + booking.getName() + "</name>\r\n"
+                            + "\t<description>Size in squared meter: " + booking.getSize()
+                            + "\r\n" + (booking.isSexy() ? "This camp contains explicit content" : "This camp is family safe")
+                            + "\r\n" + (booking.isNoisy() ? "This camp is noisy" : "This camp is not noisy") + "</description>\r\n"
+                            + "\t<Style>\r\n"
+                            + "\t\t<LineStyle>\r\n"
+                            + "\t\t\t<color>" + stroke_hex + "</color>\r\n"
+                            + "\t\t\t<width>" + booking.getArea().getStrokeWidth() + "</width>\r\n"
+                            + "\t\t</LineStyle>\r\n"
+                            + "\t\t<PolyStyle>\r\n"
+                            + "\t\t\t<color>" + fill_hex + "</color>\r\n"
+                            + "\t\t</PolyStyle>\r\n"
+                            + "\t</Style>\r\n"
+                            + "\t<Polygon>\r\n"
+                            + "\t\t<altitudeMode>clampToGround</altitudeMode>\r\n"
+                            + "\t\t<outerBoundaryIs>\r\n"
+                            + "\t\t\t<LinearRing>\r\n"
+                            + "\t\t\t\t<coordinates>\r\n"
+                            + tmpBuild
+                            + "\t\t\t\t</coordinates>\r\n"
+                            + "\t\t\t</LinearRing>\r\n"
+                            + "\t\t</outerBoundaryIs>\r\n"
+                            + "\t</Polygon>\r\n"
+                            + "</Placemark>\r\n\r\n");
+
+                    fw.write("<Placemark>\r\n"
+                            + "\t<name>" + booking.getName() + "</name>\r\n"
+                            + "\t<Style>\r\n"
+                            + "\t\t<LabelStyle>\r\n"
+                            + "\t\t\t<scale>0.85</scale>\r\n"
+                            + "\t\t\t<color>#ffffffff</color>\r\n"
+                            + "\t\t</LabelStyle>\r\n"
+                            + "\t\t<IconStyle>\r\n"
+                            + "\t\t\t<Icon></Icon>\r\n"
+                            + "\t\t</IconStyle>\r\n"
+                            + "\t</Style>\r\n"
+                            + "\t<Point>\r\n"
+                            + "\t\t<coordinates>" + booking.getText().getX() + "," + -1.0 * booking.getText().getY() + "</coordinates>\r\n"
+                            + "\t</Point>"
+                            + "</Placemark>\r\n\r\n");
                 }
-
-                fw.write("<Placemark>\r\n"
-                        + "\t<name>" + booking.getName() + "</name>\r\n"
-                        + "\t<description>Size in squared meter: " + booking.getSize()
-                        + "\r\n" + (booking.isSexy() ? "This camp contains explicit content" : "This camp is family safe")
-                        + "\r\n" + (booking.isNoisy() ? "This camp is noisy" : "This camp is not noisy") + "</description>\r\n"
-                        + "\t<Style>\r\n"
-                        + "\t\t<LineStyle>\r\n"
-                        + "\t\t\t<color>" + stroke_hex + "</color>\r\n"
-                        + "\t\t\t<width>" + booking.getArea().getStrokeWidth() + "</width>\r\n"
-                        + "\t\t</LineStyle>\r\n"
-                        + "\t\t<PolyStyle>\r\n"
-                        + "\t\t\t<color>" + fill_hex + "</color>\r\n"
-                        + "\t\t</PolyStyle>\r\n"
-                        + "\t</Style>\r\n"
-                        + "\t<Polygon>\r\n"
-                        + "\t\t<altitudeMode>clampToGround</altitudeMode>\r\n"
-                        + "\t\t<outerBoundaryIs>\r\n"
-                        + "\t\t\t<LinearRing>\r\n"
-                        + "\t\t\t\t<coordinates>\r\n"
-                        + tmpBuild
-                        + "\t\t\t\t</coordinates>\r\n"
-                        + "\t\t\t</LinearRing>\r\n"
-                        + "\t\t</outerBoundaryIs>\r\n"
-                        + "\t</Polygon>\r\n"
-                        + "</Placemark>\r\n\r\n");
-
-                fw.write("<Placemark>\r\n"
-                        + "\t<name>" + booking.getName() + "</name>\r\n"
-                        + "\t<Style>\r\n"
-                        + "\t\t<LabelStyle>\r\n"
-                        + "\t\t\t<scale>0.85</scale>\r\n"
-                        + "\t\t\t<color>#ffffffff</color>\r\n"
-                        + "\t\t</LabelStyle>\r\n"
-                        + "\t\t<IconStyle>\r\n"
-                        + "\t\t\t<Icon></Icon>\r\n"
-                        + "\t\t</IconStyle>\r\n"
-                        + "\t</Style>\r\n"
-                        + "\t<Point>\r\n"
-                        + "\t\t<coordinates>" + booking.getText().getX() + "," + -1.0 * booking.getText().getY() + "</coordinates>\r\n"
-                        + "\t</Point>"
-                        + "</Placemark>\r\n\r\n");
             }
 
             fw.write("</Document>\r\n"

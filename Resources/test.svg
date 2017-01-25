@@ -1,9 +1,0 @@
-<svg>
-    <defs>
-        <linearGradient id="Gradient-1">
-            <stop offset="0%" stop-color="#bbc42a" />
-            <stop offset="100%" stop-color="#765373" />
-        </linearGradient>
-    </defs>
-    <rect x="10" y="10" width="200" height="100" fill= "url(#Gradient-1)" stroke="#333333" stroke-width="3px" />
-</svg>

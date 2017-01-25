@@ -1,5 +1,6 @@
 package afrikaburn;
 
+import java.awt.geom.Line2D;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
@@ -13,6 +14,8 @@ import static java.lang.Math.signum;
 import static java.lang.Math.sin;
 import static java.lang.Math.sqrt;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Objects;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.collections.ObservableList;
@@ -24,6 +27,7 @@ import javafx.scene.input.TransferMode;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
+import javafx.scene.shape.Circle;
 import javafx.scene.shape.Polygon;
 import javafx.scene.shape.Shape;
 import javafx.scene.text.Text;
@@ -45,11 +49,13 @@ public final class MapController {
     private final double[] yMax;    // Largest Y-Value of map
     private final double[] xMin;    // Smallest X-Value of map
     private final double[] xMax;    // Largest X-Value of map
+    private double delX, delY;
     private final Label infoLabel;
     private final Pane pane_Map;
     private boolean isEditing = false;
     private final VBox clientList;
     private final File csvData;
+    private final Circle dot;
 
     /**
      * @Description: Reads the map from the file (name must be
@@ -61,6 +67,9 @@ public final class MapController {
         this.pane_Map = map;
         this.clientList = clientList;
         this.csvData = csvData;
+        delX = 0;
+        delY = 0;
+        dot = new Circle();
 
         yMin = new double[2];
         yMax = new double[2];
@@ -94,6 +103,7 @@ public final class MapController {
 
         setupMap();
         resetMap();
+        pane_Map.getChildren().add(dot);
     }
 
     /**
@@ -148,7 +158,8 @@ public final class MapController {
 
     /**
      * When a client is added, the shapes get listeners assigned to it
-     * @param booking 
+     *
+     * @param booking
      */
     public void addBooking(Booking booking) {
         setClientListeners(booking.getArea());
@@ -173,7 +184,6 @@ public final class MapController {
             if (db.hasString()) {
                 String nodeId = db.getString();
                 success = true;
-                infoLabel.setText("Client Placed.");
                 updateFile();
             }
             e.setDropCompleted(success);
@@ -183,7 +193,7 @@ public final class MapController {
         mapCurrent.setOnDragOver((DragEvent e) -> {
             if (e.getDragboard().hasString()) {
                 e.acceptTransferModes(TransferMode.MOVE);
-                Polygon booking = bookings.get(Integer.parseInt(e.getDragboard().getString().split(",")[0])).getArea();
+                Booking booking = bookings.get(Integer.parseInt(e.getDragboard().getString().split(",")[0]));
                 Text label = bookings.get(Integer.parseInt(e.getDragboard().getString().split(",")[0])).getText();
 
                 moveShow(mapCurrent,
@@ -216,8 +226,10 @@ public final class MapController {
     }
 
     /**
-     * The method takes the polygons and texts from the clients and assigns listeners to them
-     * @param clientCurrent 
+     * The method takes the polygons and texts from the clients and assigns
+     * listeners to them
+     *
+     * @param clientCurrent
      */
     private void setClientListeners(Shape clientCurrent) {
         clientCurrent.setOnMouseClicked(e -> {
@@ -232,7 +244,6 @@ public final class MapController {
             if (db.hasString()) {
                 String nodeId = db.getString();
                 success = true;
-                infoLabel.setText("Client Placed.");
                 updateFile();
             }
             e.setDropCompleted(success);
@@ -250,7 +261,7 @@ public final class MapController {
                         if (plane.contains(center[0], center[1])) {
 
                             moveShow(plane,
-                                    bookings.get(Integer.parseInt(e.getDragboard().getString().split(",")[0])).getArea(),
+                                    bookings.get(Integer.parseInt(e.getDragboard().getString().split(",")[0])),
                                     bookings.get(Integer.parseInt(e.getDragboard().getString().split(",")[0])).getText(),
                                     Double.parseDouble(e.getDragboard().getString().split(",")[3]),
                                     Double.parseDouble(e.getDragboard().getString().split(",")[4]),
@@ -360,13 +371,17 @@ public final class MapController {
 
     /**
      * Function drags the polygons on the 5100x5100 grid
+     *
      * @param deltaX
      * @param deltaY
      */
     public void dragMap(double deltaX, double deltaY) {
         if (!isEditing) {
-            pane_Map.getChildren().forEach((component) -> {
-                component.getTransforms().add(new Translate(deltaX, deltaY));
+            delX += deltaX;
+            delY += deltaY;
+            pane_Map.getChildren().forEach((current) -> {
+                current.getTransforms().clear();
+                current.getTransforms().add(new Translate(delX, delY));
             });
         }
     }
@@ -432,11 +447,15 @@ public final class MapController {
      */
     public double area(Polygon bound) {
         double area = 0;
-        for (int data = 0; data < bound.getPoints().size() - 3; data += 2) {
-            area -= (bound.getPoints().get(data) * bound.getPoints()
-                    .get(data + 3));
-            area += (bound.getPoints().get(data + 1) * bound.getPoints()
-                    .get(data + 2));
+        // Connect the first point to the last point
+        // The formula used can be found at: http://www.mathopenref.com/coordpolygonarea.html
+        area += bound.getPoints().get(bound.getPoints().size() - 2) * bound.getPoints().get(1);
+        area -= bound.getPoints().get(bound.getPoints().size() - 1) * bound.getPoints().get(0);
+        for (int point = 0; point < bound.getPoints().size() - 3; point += 2) {
+            area += (bound.getPoints().get(point) * bound.getPoints()
+                    .get(point + 3));
+            area -= (bound.getPoints().get(point + 1) * bound.getPoints()
+                    .get(point + 2));
         }
         area /= 2;
         area *= GV.METER_SQUARED_2_MAP_RATIO;
@@ -453,11 +472,24 @@ public final class MapController {
         return round(dy / dx * 100) / 100.0;
     }
 
-    private void moveShow(Polygon plane, Polygon booking, Text label, double faceLength, double area, double mouseX, double mouseY) {
-
+    /**
+     * This method finds the point on the polygon closest to the mouse and draws
+     * a polygon inside the square
+     *
+     * @param plane
+     * @param booking
+     * @param label
+     * @param faceLength
+     * @param area
+     * @param mouseX
+     * @param mouseY
+     */
+    private void moveShow(Polygon plane, Booking clientBooking, Text label, double faceLength, double area, double mouseX, double mouseY) {
         // Declare two points and use the first two as default
+        Polygon booking = clientBooking.getArea();
         double[] line_closest = new double[4];
         double x1, y1, x2, y2;
+        int polygonIndexClosest = 0, polygonIndexClosestSave = 0;
 
         // Connect the last point to the first one
         x1 = plane.getPoints().get(plane.getPoints().size() - 2);
@@ -481,15 +513,19 @@ public final class MapController {
             double line_length = length(x1, y1, x2, y2);
             double gradient = gradient(x1, y1, x2, y2);
 
+            // Check each unit length of the line - increases the resolution
             for (int i = 0; i < line_length; i++) {
-                temp_distance = length(x1 + signum(x2 - x1) * i * abs(cos(atan(gradient))), y1 + signum(y2 - y1) * i * abs(sin(atan(gradient))), mouseX, mouseY);
+                temp_distance = length(x1 + signum(x2 - x1) * i * abs(cos(atan(gradient))),
+                        y1 + signum(y2 - y1) * i * abs(sin(atan(gradient))),
+                        mouseX,
+                        mouseY);
 
                 if (temp_distance < shortest) {
                     line_closest[0] = x1;
                     line_closest[1] = y1;
                     line_closest[2] = x2;
                     line_closest[3] = y2;
-
+                    polygonIndexClosest = x == 0 ? plane.getPoints().size() - 2 : x - 2; // x was increased by 2
                     shortest = temp_distance;
                 }
             }
@@ -504,14 +540,14 @@ public final class MapController {
                 y2 = plane.getPoints().get(x + 3);
             }
         }
+        polygonIndexClosestSave = polygonIndexClosest;
 
         // Find the closest point to the mouse pointer
         double gradient = gradient(line_closest[0], line_closest[1], line_closest[2], line_closest[3]);
         double gradient_ort = -1 / gradient;
         double offset_1 = (line_closest[1] + line_closest[3]) / 2.0 - gradient * (line_closest[0] + line_closest[2]) / 2.0;
         double offset_ort_1 = mouseY - gradient_ort * mouseX;
-        double xi;
-        double yi;
+        double xi, yi;
 
         if (gradient > 1e10) {
             xi = (line_closest[0] + line_closest[2]) / 2.0;
@@ -526,66 +562,273 @@ public final class MapController {
 
         // The closest to the mouse pointer is the origin
         double prev_x = xi;
-        double prev_y = yi; // Next point on the polygon.
+        double prev_y = yi;
         double next_x;
         double next_y;
 
-        ObservableList<Double> oldPoints = booking.getPoints();
+        clientBooking.setHeight(1);
+        int[] indexHeight = new int[2];
+        double[] gradientHeight = new double[2];
+        int index_direction, sign; // Counts the total legs facing downwards, if two, then the booking must flip
         Polygon test = new Polygon();
+        test.getPoints().addAll(xi, yi); // Add the point closest to the mouse
 
-        test.getPoints().addAll(xi, yi);
+        double extrudedLength = 0, maxLength; // Total length the front has been drawn
+        boolean placed = true;
 
-        // Draw the block
-        if (!plane.contains(xi + area / faceLength / GV.METER_2_MAP_RATIO * cos(atan(gradient_ort)), yi + area / faceLength / GV.METER_2_MAP_RATIO * sin(atan(gradient_ort)))) {
-            // First Point
-            next_x = prev_x + faceLength / 2.0 / GV.METER_2_MAP_RATIO * cos(atan(gradient));
-            next_y = prev_y + faceLength / 2.0 / GV.METER_2_MAP_RATIO * sin(atan(gradient));
-            test.getPoints().addAll(next_x, next_y);
+        gradient = gradient(prev_x,
+                prev_y,
+                plane.getPoints().get(polygonIndexClosest),
+                plane.getPoints().get(polygonIndexClosest + 1));
 
-            // Second Point
-            next_x -= area / faceLength / GV.METER_2_MAP_RATIO * cos(atan(gradient_ort));
-            next_y -= area / faceLength / GV.METER_2_MAP_RATIO * sin(atan(gradient_ort));
-            test.getPoints().addAll(next_x, next_y);
+        // First Point
+        next_x = prev_x + faceLength / 2.0 / GV.METER_2_MAP_RATIO * cos(atan(gradient));
+        next_y = prev_y + faceLength / 2.0 / GV.METER_2_MAP_RATIO * sin(atan(gradient));
 
-            // Third Point
-            next_x -= faceLength / GV.METER_2_MAP_RATIO * cos(atan(gradient));
-            next_y -= faceLength / GV.METER_2_MAP_RATIO * sin(atan(gradient));
-            test.getPoints().addAll(next_x, next_y);
+        double length_to_point_one, length_to_point_two;
 
-            // Fourth Point
-            next_x += area / faceLength / GV.METER_2_MAP_RATIO * cos(atan(gradient_ort));
-            next_y += area / faceLength / GV.METER_2_MAP_RATIO * sin(atan(gradient_ort));
-            test.getPoints().addAll(next_x, next_y, xi, yi);
+        if (polygonIndexClosest == plane.getPoints().size() - 2) {
+            length_to_point_one = length(next_x,
+                    next_y,
+                    plane.getPoints().get(polygonIndexClosest),
+                    plane.getPoints().get(polygonIndexClosest + 1));
+            length_to_point_two = length(next_x,
+                    next_y,
+                    plane.getPoints().get(0),
+                    plane.getPoints().get(1));
         } else {
-            // First Point
-            next_x = prev_x + faceLength / 2.0 / GV.METER_2_MAP_RATIO * cos(atan(gradient));
-            next_y = prev_y + faceLength / 2.0 / GV.METER_2_MAP_RATIO * sin(atan(gradient));
-            test.getPoints().addAll(next_x, next_y);
+            length_to_point_one = length(next_x,
+                    next_y,
+                    plane.getPoints().get(polygonIndexClosest),
+                    plane.getPoints().get(polygonIndexClosest + 1));
+            length_to_point_two = length(next_x,
+                    next_y,
+                    plane.getPoints().get(polygonIndexClosest + 2),
+                    plane.getPoints().get(polygonIndexClosest + 3));
+        }
 
-            // Second Point
-            next_x += area / faceLength / GV.METER_2_MAP_RATIO * cos(atan(gradient_ort));
-            next_y += area / faceLength / GV.METER_2_MAP_RATIO * sin(atan(gradient_ort));
-            test.getPoints().addAll(next_x, next_y);
+        if (length_to_point_one < length_to_point_two) {
+            index_direction = 1;
+        } else {
+            index_direction = -1;
+            polygonIndexClosest += 2;
+            sign = (int) signum(plane.getPoints().get(polygonIndexClosest) - prev_x);
+            sign = sign == 0 ? 1 : sign;
+            next_x = prev_x + sign * faceLength / 2.0 / GV.METER_2_MAP_RATIO * (cos(atan(gradient)));
+            next_y = prev_y + sign * faceLength / 2.0 / GV.METER_2_MAP_RATIO * (sin(atan(gradient)));
+        }
 
-            // Third Point
-            next_x -= faceLength / GV.METER_2_MAP_RATIO * cos(atan(gradient));
-            next_y -= faceLength / GV.METER_2_MAP_RATIO * sin(atan(gradient));
-            test.getPoints().addAll(next_x, next_y);
+        maxLength = length(xi, yi, plane.getPoints().get(polygonIndexClosest),
+                plane.getPoints().get(polygonIndexClosest + 1));
 
-            // Fourth Point
-            next_x -= area / faceLength / GV.METER_2_MAP_RATIO * cos(atan(gradient_ort));
-            next_y -= area / faceLength / GV.METER_2_MAP_RATIO * sin(atan(gradient_ort));
-            test.getPoints().addAll(next_x, next_y, xi, yi);
+        if (faceLength / 2.0 / GV.METER_2_MAP_RATIO < maxLength) {
+            test.getPoints().addAll(next_x, next_y);
+        } else {
+            do {
+                // Add the next point from the plane's polygon - follows it
+                prev_x = plane.getPoints().get(polygonIndexClosest);
+                prev_y = plane.getPoints().get(polygonIndexClosest + 1);
+                test.getPoints().addAll(prev_x, prev_y);
+
+                // Increase the extruded length
+                extrudedLength += maxLength;
+
+                // Roll over for when the end is reached
+                if (index_direction > 0) {
+                    polygonIndexClosest = (polygonIndexClosest == 0) ? plane.getPoints().size() - 2 : polygonIndexClosest - 2;
+                } else {
+                    polygonIndexClosest = (polygonIndexClosest == plane.getPoints().size() - 2) ? 0 : polygonIndexClosest + 2;
+                }
+
+                // Gradient to the next point
+                gradient = gradient(prev_x,
+                        prev_y,
+                        plane.getPoints().get(polygonIndexClosest),
+                        plane.getPoints().get(polygonIndexClosest + 1));
+
+                // Available length to extrude on
+                maxLength = length(prev_x,
+                        prev_y,
+                        plane.getPoints().get(polygonIndexClosest),
+                        plane.getPoints().get(polygonIndexClosest + 1));
+
+                sign = (int) signum(plane.getPoints().get(polygonIndexClosest) - prev_x);
+                sign = sign == 0 ? 1 : sign;
+                next_x = prev_x + sign * (faceLength / 2.0 / GV.METER_2_MAP_RATIO - extrudedLength) * (cos(atan(gradient)));
+                next_y = prev_y + sign * (faceLength / 2.0 / GV.METER_2_MAP_RATIO - extrudedLength) * (sin(atan(gradient)));
+
+                if (faceLength / 2.0 / GV.METER_2_MAP_RATIO - extrudedLength < maxLength) {
+                    test.getPoints().addAll(next_x, next_y);
+                }
+            } while (faceLength / 2.0 / GV.METER_2_MAP_RATIO - extrudedLength > maxLength);
+        }
+
+        // Save frontage to object to export to gpx
+        final double BIGGEST_EDGE = Math.abs(xMax[0] - xMin[0]) < Math.abs(yMax[0] - yMin[0]) ? Math.abs(yMax[0] - yMin[0]) : Math.abs(xMax[0] - xMin[0]);
+        clientBooking.setFrontage(0, next_x / pane_Map.getWidth() * BIGGEST_EDGE + xMin[0]);
+        clientBooking.setFrontage(1, next_y / pane_Map.getWidth() * BIGGEST_EDGE + yMin[0]);
+
+        // Second Point
+        gradient_ort = -1 / gradient;
+        indexHeight[0] = test.getPoints().size() - 2;
+        gradientHeight[0] = gradient_ort;
+
+        next_x += clientBooking.getHeight() * cos(atan(gradient_ort));
+        next_y += clientBooking.getHeight() * sin(atan(gradient_ort));
+
+        // Extrude the other way
+        if (!plane.contains(next_x, next_y)) {
+            next_x -= 2 * clientBooking.getHeight() * cos(atan(gradient_ort));
+            next_y -= 2 * clientBooking.getHeight() * sin(atan(gradient_ort));
+        }
+        test.getPoints().addAll(next_x, next_y);
+
+        // Start again at the center
+        // Third Point
+        ArrayList<Double> pointsToAdd = new ArrayList<>();
+        prev_x = xi;
+        prev_y = yi;
+        extrudedLength = 0;
+        if (index_direction > 0) {
+            polygonIndexClosest = polygonIndexClosestSave + 2;
+        } else {
+            polygonIndexClosest = polygonIndexClosestSave;
+        }
+
+        // Gradient to the next point
+        gradient = gradient(prev_x,
+                prev_y,
+                plane.getPoints().get(polygonIndexClosest),
+                plane.getPoints().get(polygonIndexClosest + 1));
+
+        // The length to the next point
+        maxLength = length(prev_x,
+                prev_y,
+                plane.getPoints().get(polygonIndexClosest),
+                plane.getPoints().get(polygonIndexClosest + 1));
+
+        // Subtracking - opposite direction
+        sign = (int) signum(plane.getPoints().get(polygonIndexClosest) - prev_x);
+        sign = sign == 0 ? 1 : sign;
+        next_x = prev_x + sign * faceLength / 2.0 / GV.METER_2_MAP_RATIO * cos(atan(gradient));
+        next_y = prev_y + sign * faceLength / 2.0 / GV.METER_2_MAP_RATIO * sin(atan(gradient));
+
+        // Keep adding points until the desired extrusion length is met
+        if (faceLength / 2.0 / GV.METER_2_MAP_RATIO < maxLength) {
+            pointsToAdd.add(next_x);
+            pointsToAdd.add(next_y);
+        } else {
+            do {
+                prev_x = plane.getPoints().get(polygonIndexClosest);
+                prev_y = plane.getPoints().get(polygonIndexClosest + 1);
+                pointsToAdd.add(prev_x);
+                pointsToAdd.add(prev_y);
+                if (index_direction > 0) {
+                    polygonIndexClosest = (polygonIndexClosest == plane.getPoints().size() - 2) ? 0 : polygonIndexClosest + 2;
+                } else {
+                    polygonIndexClosest = (polygonIndexClosest == 0) ? plane.getPoints().size() - 2 : polygonIndexClosest - 2;
+                }
+                extrudedLength += maxLength;
+
+                gradient = gradient(prev_x,
+                        prev_y,
+                        plane.getPoints().get(polygonIndexClosest),
+                        plane.getPoints().get(polygonIndexClosest + 1));
+
+                maxLength = length(prev_x,
+                        prev_y,
+                        plane.getPoints().get(polygonIndexClosest),
+                        plane.getPoints().get(polygonIndexClosest + 1));
+
+                sign = (int) signum(plane.getPoints().get(polygonIndexClosest) - prev_x);
+                sign = sign == 0 ? 1 : sign;
+                next_x = prev_x + sign * (faceLength / 2.0 / GV.METER_2_MAP_RATIO - extrudedLength) * cos(atan(gradient));
+                next_y = prev_y + sign * (faceLength / 2.0 / GV.METER_2_MAP_RATIO - extrudedLength) * sin(atan(gradient));
+
+                if (faceLength / 2.0 / GV.METER_2_MAP_RATIO - extrudedLength < maxLength) {
+                    pointsToAdd.add(next_x);
+                    pointsToAdd.add(next_y);
+                }
+            } while (faceLength / 2.0 / GV.METER_2_MAP_RATIO - extrudedLength > maxLength);
+        }
+
+        clientBooking.setFrontage(2, next_x / pane_Map.getWidth() * BIGGEST_EDGE + xMin[0]);
+        clientBooking.setFrontage(3, next_y / pane_Map.getWidth() * BIGGEST_EDGE + yMin[0]);
+
+        // Third Point
+        gradient_ort = -1 / gradient;
+        indexHeight[1] = test.getPoints().size() + 2;
+        gradientHeight[1] = gradient_ort;
+        next_x += clientBooking.getHeight() * cos(atan(gradient_ort));
+        next_y += clientBooking.getHeight() * sin(atan(gradient_ort));
+        if (!plane.contains(next_x, next_y)) {
+            next_x -= 2 * clientBooking.getHeight() * cos(atan(gradient_ort));
+            next_y -= 2 * clientBooking.getHeight() * sin(atan(gradient_ort));
+        }
+        test.getPoints().addAll(next_x, next_y);
+
+        // Adds the rest of the points
+        for (int i = pointsToAdd.size() - 1; i >= 0; i -= 2) {
+            test.getPoints().addAll(pointsToAdd.get(i - 1), pointsToAdd.get(i));
+        }
+
+        // Increases the length until the area is 99.9% accurate
+        while (area(test) <= 0.999 * area) {
+            clientBooking.setHeight(clientBooking.getHeight() + 1);
+            double tempx = test.getPoints().get(indexHeight[0]) + clientBooking.getHeight() * cos(atan(gradientHeight[0]));
+            double tempy = test.getPoints().get(indexHeight[0] + 1) + clientBooking.getHeight() * sin(atan(gradientHeight[0]));
+
+            if (!plane.contains(tempx, tempy)) {
+                tempx = test.getPoints().get(indexHeight[0]) - clientBooking.getHeight() * cos(atan(gradientHeight[0]));
+                tempy = test.getPoints().get(indexHeight[0] + 1) - clientBooking.getHeight() * sin(atan(gradientHeight[0]));
+            }
+
+            test.getPoints().set(indexHeight[0] + 2, tempx);
+            test.getPoints().set(indexHeight[0] + 3, tempy);
+
+            tempx = test.getPoints().get(indexHeight[1]) + clientBooking.getHeight() * cos(atan(gradientHeight[1]));
+            tempy = test.getPoints().get(indexHeight[1] + 1) + clientBooking.getHeight() * sin(atan(gradientHeight[1]));
+
+            if (!plane.contains(tempx, tempy)) {
+                tempx = test.getPoints().get(indexHeight[1]) - clientBooking.getHeight() * cos(atan(gradientHeight[1]));
+                tempy = test.getPoints().get(indexHeight[1] + 1) - clientBooking.getHeight() * sin(atan(gradientHeight[1]));
+            }
+
+            test.getPoints().set(indexHeight[1] - 2, tempx);
+            test.getPoints().set(indexHeight[1] - 1, tempy);
+
+            Line2D line1 = new Line2D.Double(test.getPoints().get(indexHeight[0]),
+                    test.getPoints().get(indexHeight[0] + 1),
+                    test.getPoints().get(indexHeight[0] + 2),
+                    test.getPoints().get(indexHeight[0] + 3));
+            Line2D line2 = new Line2D.Double(test.getPoints().get(indexHeight[1]),
+                    test.getPoints().get(indexHeight[1] + 1),
+                    test.getPoints().get(indexHeight[1] - 2),
+                    test.getPoints().get(indexHeight[1] - 1));
+
+            if (line1.intersectsLine(line2)
+                    || !plane.contains(test.getPoints().get(indexHeight[0] + 2),
+                            test.getPoints().get(indexHeight[0] + 3))
+                    || !plane.contains(test.getPoints().get(indexHeight[1] - 2),
+                            test.getPoints().get(indexHeight[1] - 1))) {
+                placed = false;
+                break;
+            }
         }
 
         double[] center = getCenter(test);
 
-        if (plane.contains(center[0], center[1])) {
-            booking.getPoints().removeAll(oldPoints);
+        // Test whether the booking can be placed where the user wants it
+        if (placed && plane.contains(center[0], center[1])) {
+            booking.getPoints().clear();
             booking.getPoints().addAll(test.getPoints());
             label.setWrappingWidth(booking.getLayoutBounds().getWidth() / 2.0);
             label.setX((booking.getLayoutBounds().getMaxX() + booking.getLayoutBounds().getMinX()) / 2.0 - label.getLayoutBounds().getWidth() / 2.0);
             label.setY((booking.getLayoutBounds().getMaxY() + booking.getLayoutBounds().getMinY()) / 2.0);
+            clientBooking.setHeight(1);
+            infoLabel.setText("Real Area: " + area(test) + " m\u00B2");
+        } else {
+            infoLabel.setText("Booking can't fit into this space.");
         }
     }
 
@@ -610,10 +853,12 @@ public final class MapController {
             for (Booking booking : bookings) {
                 String points = booking.getArea().getPoints().toString().replaceAll(",", ";");
                 String colour = booking.getArea().getFill().toString();
+                String frontage = Arrays.toString(booking.getFrontage()).replaceAll(",", ";");
                 String[] tmp = booking.toString().split(",");
                 if (tmp[1].equalsIgnoreCase("booking")) {
-                    writer.write(tmp[1] + "," + tmp[2] + "," + tmp[3] + "," + tmp[4] + "," + tmp[5] + "," + tmp[6] + "," + points + "," + colour + "\n");
-                } else {
+                    writer.write(tmp[1] + "," + tmp[2] + "," + tmp[3] + "," + tmp[4] + "," + tmp[5] + "," + tmp[6] + "," + points + "," + colour + "," + frontage + "\n");
+                } // For the future case where the programmer wants to implement different algorithms for different kind of bookings 
+                else {
                     writer.write(tmp[1] + "," + tmp[2] + "," + tmp[3] + "," + tmp[4] + "," + tmp[5] + "," + points + "," + colour + "\n");
                 }
             }
@@ -637,5 +882,9 @@ public final class MapController {
 
     public Polygon[] getMapPolygons() {
         return mapPolygons;
+    }
+
+    public double[] getDrag() {
+        return new double[]{delX, delY};
     }
 }

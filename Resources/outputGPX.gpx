@@ -1,0 +1,139 @@
+<?xml version="1.0" standalone="yes"?>
+<gpx xmlns="http://www.topografix.com/GPX/1/1" creator="KML2GPX.COM" version="1.1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd">
+	<metadata>
+		<name><![CDATA[AfrikaBurn Map]]></name>
+	</metadata>
+
+<wpt lat="-32.32462040564876" lon="19.747930489639415">
+	<ele>0</ele>
+	<name><![CDATA[Stefan]]></name>
+	<cmt><![CDATA[Side One]]></cmt>
+</wpt>
+
+<wpt lat="-32.32461503321347" lon="19.74783295439277">
+	<ele>0</ele>
+	<name><![CDATA[Stefan]]></name>
+	<cmt><![CDATA[Side Two]]></cmt>
+</wpt>
+
+<wpt lat="-32.324615007637924" lon="19.747832419066732">
+	<ele>0</ele>
+	<name><![CDATA[Nico]]></name>
+	<cmt><![CDATA[Side One]]></cmt>
+</wpt>
+
+<wpt lat="-32.32461617839895" lon="19.74773484702333">
+	<ele>0</ele>
+	<name><![CDATA[Nico]]></name>
+	<cmt><![CDATA[Side Two]]></cmt>
+</wpt>
+
+<wpt lat="-32.325980210707286" lon="19.750363597022815">
+	<ele>0</ele>
+	<name><![CDATA[Francois Lombard]]></name>
+	<cmt><![CDATA[Side One]]></cmt>
+</wpt>
+
+<wpt lat="-32.32584254359404" lon="19.75022537643399">
+	<ele>0</ele>
+	<name><![CDATA[Francois Lombard]]></name>
+	<cmt><![CDATA[Side Two]]></cmt>
+</wpt>
+
+<wpt lat="-32.32463355573789" lon="19.748322141818942">
+	<ele>0</ele>
+	<name><![CDATA[Roger]]></name>
+	<cmt><![CDATA[Side One]]></cmt>
+</wpt>
+
+<wpt lat="-32.32462074988599" lon="19.747931600913027">
+	<ele>0</ele>
+	<name><![CDATA[Roger]]></name>
+	<cmt><![CDATA[Side Two]]></cmt>
+</wpt>
+
+<wpt lat="-32.32514636906819" lon="19.748389550770668">
+	<ele>0</ele>
+	<name><![CDATA[Test 25m^2]]></name>
+	<cmt><![CDATA[Side One]]></cmt>
+</wpt>
+
+<wpt lat="-32.32514054790469" lon="19.74834104107476">
+	<ele>0</ele>
+	<name><![CDATA[Test 25m^2]]></name>
+	<cmt><![CDATA[Side Two]]></cmt>
+</wpt>
+
+<wpt lat="-32.32514027832395" lon="19.74833879456862">
+	<ele>0</ele>
+	<name><![CDATA[Test 50m^2]]></name>
+	<cmt><![CDATA[Side One]]></cmt>
+</wpt>
+
+<wpt lat="-32.32513445716044" lon="19.748290284872713">
+	<ele>0</ele>
+	<name><![CDATA[Test 50m^2]]></name>
+	<cmt><![CDATA[Side Two]]></cmt>
+</wpt>
+
+<wpt lat="-32.32514115125322" lon="19.74751260520112">
+	<ele>0</ele>
+	<name><![CDATA[Dieter]]></name>
+	<cmt><![CDATA[Side One]]></cmt>
+</wpt>
+
+<wpt lat="-32.325169544972184" lon="19.747221073868875">
+	<ele>0</ele>
+	<name><![CDATA[Dieter]]></name>
+	<cmt><![CDATA[Side Two]]></cmt>
+</wpt>
+
+<wpt lat="-32.32506422510563" lon="19.74719940350739">
+	<ele>0</ele>
+	<name><![CDATA[Kristiaan]]></name>
+	<cmt><![CDATA[Side One]]></cmt>
+</wpt>
+
+<wpt lat="-32.324765150290524" lon="19.747171588836604">
+	<ele>0</ele>
+	<name><![CDATA[Kristiaan]]></name>
+	<cmt><![CDATA[Side Two]]></cmt>
+</wpt>
+
+<wpt lat="-32.32511985193753" lon="19.74790494922834">
+	<ele>0</ele>
+	<name><![CDATA[Pieter]]></name>
+	<cmt><![CDATA[Side One]]></cmt>
+</wpt>
+
+<wpt lat="-32.3251413938953" lon="19.747514937702505">
+	<ele>0</ele>
+	<name><![CDATA[Pieter]]></name>
+	<cmt><![CDATA[Side Two]]></cmt>
+</wpt>
+
+<wpt lat="-32.32461658387917" lon="19.747734227862324">
+	<ele>0</ele>
+	<name><![CDATA[Test Long Front]]></name>
+	<cmt><![CDATA[Side One]]></cmt>
+</wpt>
+
+<wpt lat="-32.3247643855391" lon="19.747171121254222">
+	<ele>0</ele>
+	<name><![CDATA[Test Long Front]]></name>
+	<cmt><![CDATA[Side Two]]></cmt>
+</wpt>
+
+<wpt lat="-32.3251341582907" lon="19.748288984022295">
+	<ele>0</ele>
+	<name><![CDATA[Karlien]]></name>
+	<cmt><![CDATA[Side One]]></cmt>
+</wpt>
+
+<wpt lat="-32.32511985193753" lon="19.747898652578602">
+	<ele>0</ele>
+	<name><![CDATA[Karlien]]></name>
+	<cmt><![CDATA[Side Two]]></cmt>
+</wpt>
+
+</gpx>

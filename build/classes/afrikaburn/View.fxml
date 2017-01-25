@@ -56,13 +56,13 @@
                   <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
                </padding>
             </Label>
-            <Label fx:id="infoLabel11" layoutX="20.0" layoutY="100.0" style="-fx-text-fill: white;" text="Front:">
+            <Label fx:id="infoLabel11" layoutX="20.0" layoutY="100.0" style="-fx-text-fill: white;" text="Front (m):">
                <padding>
                   <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
                </padding>
             </Label>
             <TextField fx:id="tfFront" layoutX="160.0" layoutY="100.0" prefHeight="30.0" prefWidth="240.0" />
-            <Label fx:id="infoLabel111" layoutX="20.0" layoutY="140.0" style="-fx-text-fill: white;" text="Area:">
+            <Label fx:id="infoLabel111" layoutX="20.0" layoutY="140.0" style="-fx-text-fill: white;" text="Area (m2):">
                <padding>
                   <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
                </padding>

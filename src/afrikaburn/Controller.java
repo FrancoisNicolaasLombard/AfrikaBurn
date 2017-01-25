@@ -61,8 +61,8 @@ public class Controller implements Initializable {
     private MapController mapController;
     private Pane pane_Map, pane_Manage_Maps;
     private ArrayList<Booking> bookings;
-    private Button btnExportMapPng, btnExportMapJSON, btnExportMapKML, btnChooseMap, btnChooseCSV;
-    private Label lblExportMapPng, lblExportMapJSON, lblExportMapKML, lblChooseMap, lblChooseCSV;
+    private Button btnExportMapPng, btnExportMapJSON, btnExportMapKML, btnChooseMap, btnChooseCSV, btnExportMapGPX;
+    private Label lblExportMapPng, lblExportMapJSON, lblExportMapKML, lblChooseMap, lblChooseCSV, lblExportMapGPX;
     private FileChooser fileChooser;
     private File csvData, jsonData;
 
@@ -122,8 +122,8 @@ public class Controller implements Initializable {
                 bookings.get(bookingNr).setSize(Double.parseDouble(tfArea.getText()));
                 bookings.get(bookingNr).setSexy(cbExplicit.getSelectionModel().getSelectedIndex() == 0);
                 bookings.get(bookingNr).setNoisy(cbLoud.getSelectionModel().getSelectedIndex() == 0);
-                if (bookings.get(bookingNr) instanceof ShowBooking) {
-                    ((ShowBooking) bookings.get(bookingNr)).setFront(Double.parseDouble(tfFront.getText()));
+                if (bookings.get(bookingNr) instanceof Booking) {
+                    bookings.get(bookingNr).setFront(Double.parseDouble(tfFront.getText()));
                 }
                 bookings.get(bookingNr).getArea().setFill(cpColour.getValue());
 
@@ -136,13 +136,13 @@ public class Controller implements Initializable {
                 infoLabel.setText("Client Updated.");
             } // Add
             else {
-                ShowBooking newBooking = new ShowBooking(bookings.size(),
+                Booking newBooking = new Booking(bookings.size(),
                         tfName.getText(),
                         Double.parseDouble(tfFront.getText()),
                         Double.parseDouble(tfArea.getText()),
                         cbExplicit.getSelectionModel().getSelectedIndex() == 0,
                         cbExplicit.getSelectionModel().getSelectedIndex() == 0,
-                        "[-1.0; -1.0]", cpColour.getValue().toString());
+                        "[-1.0; -1.0]", cpColour.getValue().toString(), "[0.0; 0.0; 0.0; 0.0]");
                 bookings.add(newBooking);
                 mapController.addBooking(newBooking); //A dd listeners
                 addList(newBooking); // Add to client list
@@ -212,6 +212,15 @@ public class Controller implements Initializable {
         }
     }
 
+    private double getMapScale() {
+        double mapScale = 1;
+        mapScale = pane_Map.getTransforms().stream()
+                .filter((x) -> (x instanceof Scale))
+                .map((x) -> x.getMxx())
+                .reduce(mapScale, (accumulator, _item) -> accumulator * _item);
+        return mapScale;
+    }
+
     /**
      * MAKE THIS A THREEAD - Loads long and cannot give a warning message
      */
@@ -219,11 +228,7 @@ public class Controller implements Initializable {
         infoLabel.setText("Please wait while the map is saved");
         try {
             pane_Map.setVisible(true);
-            double mapScale = 1;
-            mapScale = pane_Map.getTransforms().stream()
-                    .filter((x) -> (x instanceof Scale))
-                    .map((x) -> x.getMxx())
-                    .reduce(mapScale, (accumulator, _item) -> accumulator * _item);
+            double mapScale = getMapScale();
 
             pane_Map.getChildren().forEach((component) -> {
                 component.getTransforms().removeAll(component.getTransforms());
@@ -303,9 +308,9 @@ public class Controller implements Initializable {
                 btnRemove.disableProperty().set(false);
                 clientId--;
                 tfName.setText(bookings.get(clientId).getName());
-                if (bookings.get(clientId) instanceof ShowBooking) {
+                if (bookings.get(clientId) instanceof Booking) {
                     tfFront.disableProperty().set(false);
-                    tfFront.setText("" + ((ShowBooking) bookings.get(clientId)).front());
+                    tfFront.setText("" + ((Booking) bookings.get(clientId)).front());
                 } else {
                     tfFront.disableProperty().set(true);
                 }
@@ -336,7 +341,7 @@ public class Controller implements Initializable {
 
     // Add bookings to the client list
     private void addList(Booking booking) {
-        Text tmpClient = new Text(booking.getName());
+        Text tmpClient = new Text((booking.getId() + 1) + " " + booking.getName());
         tmpClient.setStyle("-fx-font-weight: bold");
         if (!booking.isPlaced()) {
             tmpClient.setFill(Color.WHITE);
@@ -349,6 +354,12 @@ public class Controller implements Initializable {
             ClipboardContent cb = new ClipboardContent();
             cb.putString(booking.toString());
             db.setContent(cb);
+            e.consume();
+        });
+
+        tmpClient.setOnMouseClicked(e -> {
+            mapController.dragMap(GV.SCREEN_W * 3 / 5 - (booking.getText().getX() + mapController.getDrag()[0]),
+                    GV.SCREEN_H * 0.9 / 2 - (booking.getText().getY() + mapController.getDrag()[1]));
             e.consume();
         });
 
@@ -442,6 +453,7 @@ public class Controller implements Initializable {
         btnExportMapPng = new Button("Export Map to PNG");
         btnExportMapKML = new Button("Export Map to KML");
         btnExportMapJSON = new Button("Export Map to JSON");
+        btnExportMapGPX = new Button("Export Map to GPX");
         btnChooseMap = new Button("Choose Map");
         btnChooseCSV = new Button("Choose CSV");
 
@@ -452,13 +464,16 @@ public class Controller implements Initializable {
         btnExportMapKML.setLayoutY(60);
         btnExportMapJSON.setLayoutX(20);
         btnExportMapJSON.setLayoutY(100);
+        btnExportMapGPX.setLayoutX(20);
+        btnExportMapGPX.setLayoutY(140);
         btnChooseMap.setLayoutX(20);
-        btnChooseMap.setLayoutY(140);
+        btnChooseMap.setLayoutY(180);
         btnChooseCSV.setLayoutX(20);
-        btnChooseCSV.setLayoutY(180);
+        btnChooseCSV.setLayoutY(220);
         btnExportMapPng.setMinWidth(200);
         btnExportMapKML.setMinWidth(200);
         btnExportMapJSON.setMinWidth(200);
+        btnExportMapGPX.setMinWidth(200);
         btnChooseMap.setMinWidth(200);
         btnChooseCSV.setMinWidth(200);
 
@@ -483,13 +498,22 @@ public class Controller implements Initializable {
             infoLabel.setText("Map has been Exported in JSON format.");
             e.consume();
         });
+        btnExportMapGPX.setOnAction(e -> {
+            GPXWriter gpxWriter = new GPXWriter(bookings);
+            infoLabel.setText("Map has been Exported in GPX format.");
+            e.consume();
+        });
         btnChooseMap.setOnAction(e -> {
             fileChooser.setTitle("Choose a JSON File to read in the Map");
             mapController = null;
             jsonData = fileChooser.showOpenDialog(window);
-            setUpProgram();
-            pane_Manage_Maps.setVisible(false);
-            infoLabel.setText("New Map has been Loaded.");
+            if (jsonData != null) {
+                setUpProgram();
+                pane_Manage_Maps.setVisible(false);
+                infoLabel.setText("New Map has been Loaded.");
+            } else {
+                infoLabel.setText("No file selected.");
+            }
             e.consume();
         });
         btnChooseCSV.setOnAction(e -> {
@@ -497,9 +521,13 @@ public class Controller implements Initializable {
             csvData = null;
             mapController = null;
             csvData = fileChooser.showOpenDialog(window);
-            setUpProgram();
-            pane_Manage_Maps.setVisible(false);
-            infoLabel.setText("New Clients have been Loaded.");
+            if (csvData != null) {
+                setUpProgram();
+                pane_Manage_Maps.setVisible(false);
+                infoLabel.setText("New Clients have been Loaded.");
+            } else {
+                infoLabel.setText("No file selected.");
+            }
             e.consume();
         });
 
@@ -507,6 +535,7 @@ public class Controller implements Initializable {
         lblExportMapPng = new Label("Exports the map to four 9900x6419 PNG files - required 7.5 GB of RAM.");
         lblExportMapKML = new Label("Exports the map to a KML file - can load into Google Maps/Earth.");
         lblExportMapJSON = new Label("Exports the map to a JSON file - can load into GeoJSON/MapShaper to change format.");
+        lblExportMapGPX = new Label("Exports the map to a GPX file that Garmin can Read.");
         lblChooseMap = new Label("Choose a GeoJSON file to load the map.");
         lblChooseCSV = new Label("Choose a CSV file in the format: \nbookingType, "
                 + "Name, "
@@ -524,10 +553,12 @@ public class Controller implements Initializable {
         lblExportMapKML.setLayoutY(60);
         lblExportMapJSON.setLayoutX(240);
         lblExportMapJSON.setLayoutY(100);
+        lblExportMapGPX.setLayoutX(240);
+        lblExportMapGPX.setLayoutY(140);
         lblChooseMap.setLayoutX(240);
-        lblChooseMap.setLayoutY(140);
+        lblChooseMap.setLayoutY(180);
         lblChooseCSV.setLayoutX(240);
-        lblChooseCSV.setLayoutY(180);
+        lblChooseCSV.setLayoutY(220);
 
         // Add components to the pane
         pane_Manage_Maps.getChildren().addAll(btnExportMapPng,
@@ -539,7 +570,9 @@ public class Controller implements Initializable {
                 lblExportMapKML,
                 lblExportMapJSON,
                 lblChooseMap,
-                lblChooseCSV);
+                lblChooseCSV,
+                btnExportMapGPX,
+                lblExportMapGPX);
     }
 
     /**
@@ -629,7 +662,8 @@ public class Controller implements Initializable {
 
     /**
      * Ensures no null fields when adding a client
-     * @return 
+     *
+     * @return
      */
     private boolean fieldsValid() {
         return !(tfName.getText().equals("")
@@ -640,7 +674,8 @@ public class Controller implements Initializable {
     }
 
     /**
-     * Clear all of the input fields after a client has been added, edited or removed
+     * Clear all of the input fields after a client has been added, edited or
+     * removed
      */
     private void clearFields() {
         cbClients.getSelectionModel().select(-1);
