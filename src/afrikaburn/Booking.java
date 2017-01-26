@@ -1,6 +1,5 @@
 package afrikaburn;
 
-import java.util.Arrays;
 import javafx.geometry.VPos;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
